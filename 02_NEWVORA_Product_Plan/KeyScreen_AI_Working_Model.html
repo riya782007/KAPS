@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KeyScreen AI — Edukey360 · by NEWVORA</title>
+<style>
+  :root{
+    --teal:#12a58c; --teal-d:#0e8574; --ink:#0f2620; --slate:#5b6b66;
+    --bg:#f4f8f7; --card:#ffffff; --line:#e2ece9;
+    --shadow:0 6px 22px rgba(15,38,32,.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:18px 22px 60px}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    padding:14px 20px;background:linear-gradient(120deg,#0f2620,#12a58c);border-radius:16px;color:#fff;box-shadow:var(--shadow)}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center;font-size:22px}
+  .brand h1{font-size:19px;font-weight:800;letter-spacing:.2px}
+  .brand .sub{font-size:12px;opacity:.85;font-weight:500}
+  .byline{font-size:11px;background:rgba(255,255,255,.16);padding:5px 11px;border-radius:20px;font-weight:700;letter-spacing:.5px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:16px 0}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+  .kpi .n{font-size:26px;font-weight:800;color:var(--teal-d);line-height:1}
+  .kpi .l{font-size:12px;color:var(--slate);margin-top:6px;font-weight:600}
+  .kpi .chip{font-size:10px;color:var(--teal);font-weight:700;background:#e6f5f1;border-radius:12px;padding:2px 8px;display:inline-block;margin-top:8px}
+
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:18px}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+  .panel h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--slate);padding:14px 16px 6px}
+  .phead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 6px}
+  .phead h2{padding:0}
+
+  .req{margin:6px 12px;padding:12px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s}
+  .req:hover{border-color:var(--teal)}
+  .req.active{border-color:var(--teal);background:#eef8f5;box-shadow:inset 0 0 0 1px var(--teal)}
+  .req .r-role{font-weight:800;font-size:14px}
+  .req .r-meta{font-size:11px;color:var(--slate);margin-top:3px}
+  .req .r-tags{margin-top:8px;display:flex;flex-wrap:wrap;gap:5px}
+  .tag{font-size:10px;background:#eef3f1;color:#3a5049;border-radius:10px;padding:3px 8px;font-weight:600}
+  .tag.must{background:#fdf1e0;color:#a4701c}
+
+  .btn{border:0;border-radius:11px;padding:10px 14px;font-weight:700;font-size:13px;cursor:pointer;transition:.15s;font-family:inherit}
+  .btn.primary{background:var(--teal);color:#fff}
+  .btn.primary:hover{background:var(--teal-d)}
+  .btn.ghost{background:#eef3f1;color:var(--ink)}
+  .btn.sm{padding:7px 11px;font-size:12px;border-radius:9px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .runbar{display:flex;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+
+  .cand-wrap{padding:8px 12px 14px}
+  .cand{border:1px solid var(--line);border-radius:13px;padding:13px 14px;margin:9px 4px;display:grid;
+    grid-template-columns:52px 1fr auto;gap:12px;align-items:start;background:#fff;opacity:0;transform:translateY(8px);animation:pop .4s forwards}
+  @keyframes pop{to{opacity:1;transform:none}}
+  .avatar{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-weight:800;color:#fff;font-size:16px}
+  .cand .nm{font-weight:800;font-size:15px}
+  .cand .ql{font-size:12px;color:var(--slate);margin-top:2px}
+  .cand .fields{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .field{font-size:10.5px;background:#f3f7f6;border:1px solid var(--line);border-radius:8px;padding:3px 8px;color:#3a5049;font-weight:600}
+  .field b{color:var(--ink)}
+  .scorebox{text-align:center;min-width:74px}
+  .ring{width:56px;height:56px;border-radius:50%;margin:0 auto;display:grid;place-items:center}
+  .ring span{width:42px;height:42px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:800;font-size:14px;color:var(--teal-d)}
+  .scorebox .lab{font-size:10px;color:var(--slate);margin-top:4px;font-weight:700}
+  .status{font-size:10.5px;font-weight:800;border-radius:10px;padding:4px 9px;display:inline-block;margin-top:6px}
+  .st-new{background:#eef3f1;color:#5b6b66}
+  .st-int{background:#e6f5f1;color:#0e8574}
+  .st-rdy{background:#e3efdf;color:#3f7d2f}
+  .st-cb{background:#fdf1e0;color:#a4701c}
+  .st-no{background:#fbe7e7;color:#b23b3b}
+  .st-else{background:#ece7fb;color:#6a4fc0}
+  .cand .why{font-size:11px;color:var(--slate);margin-top:7px;grid-column:1/4}
+  .cand .why b{color:var(--teal-d)}
+  .cactions{grid-column:1/4;display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
+
+  .board{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:12px}
+  .col{background:#f7faf9;border:1px solid var(--line);border-radius:12px;padding:10px;min-height:110px}
+  .col h3{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--slate);display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:6px}
+  .col h3 .ct{background:#fff;border:1px solid var(--line);border-radius:10px;padding:1px 7px;font-size:11px;color:var(--ink)}
+  .pcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 9px;margin-bottom:7px;font-size:12px;font-weight:700;animation:pop .35s}
+  .pcard .m{font-size:10.5px;color:var(--slate);font-weight:500;margin-top:2px}
+
+  .overlay{position:fixed;inset:0;background:rgba(15,38,32,.55);display:none;place-items:center;z-index:50;padding:20px}
+  .overlay.on{display:grid}
+  .modal{background:#fff;border-radius:18px;max-width:520px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden}
+  .modal .mh{background:linear-gradient(120deg,#0f2620,#12a58c);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px}
+  .modal .mh .dot{width:10px;height:10px;border-radius:50%;background:#7CFC9E;box-shadow:0 0 0 0 rgba(124,252,158,.7);animation:pulse 1.4s infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 10px rgba(124,252,158,0)}100%{box-shadow:0 0 0 0 rgba(124,252,158,0)}}
+  .modal .mb{padding:18px 20px;max-height:56vh;overflow:auto}
+  .msg{margin-bottom:11px;display:flex;gap:9px;animation:pop .3s}
+  .msg .who{font-size:10px;font-weight:800;color:var(--slate);min-width:50px;padding-top:3px}
+  .bubble{padding:9px 12px;border-radius:12px;font-size:13px;max-width:100%}
+  .msg.ai .bubble{background:#eef8f5;color:var(--ink)}
+  .msg.ca .bubble{background:#f3f4f6;color:#333}
+  .mf{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .verdict{font-size:13px;font-weight:800;flex:1;min-width:200px}
+  .wa{white-space:pre-wrap;background:#f7faf9;border:1px dashed var(--teal);border-radius:12px;padding:12px;font-size:12.5px;color:#234;margin-top:10px}
+
+  footer{margin-top:26px;text-align:center;font-size:11.5px;color:var(--slate)}
+  footer b{color:var(--teal-d)}
+  .flash{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+    padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;opacity:0;transition:.3s;z-index:60;pointer-events:none}
+  .flash.on{opacity:1;transform:translateX(-50%)}
+  @media(max-width:920px){.grid{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,1fr)}.board{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🎓</div>
+      <div>
+        <h1>KeyScreen AI <span style="font-weight:500;opacity:.8;font-size:14px">· Edukey360 Recruiter Copilot</span></h1>
+        <div class="sub">Auto-source → AI-match → AI-screen → auto-tag. The recruiter grunt-work, done for you.</div>
+      </div>
+    </div>
+    <div class="byline">POWERED BY NEWVORA</div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="k-screened">0</div><div class="l">Candidates AI-screened</div><div class="chip">vs. 40–50 manual calls/recruiter/day</div></div>
+    <div class="kpi"><div class="n" id="k-calls">0</div><div class="l">Screening calls automated</div><div class="chip">no telecaller needed</div></div>
+    <div class="kpi"><div class="n" id="k-hours">0.0h</div><div class="l">Recruiter-hours saved</div><div class="chip">~8 min saved / call</div></div>
+    <div class="kpi"><div class="n" id="k-ready">0</div><div class="l">Interview-ready shortlist</div><div class="chip">auto-qualified</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel" style="align-self:start">
+      <h2>Live Requirements (JDs)</h2>
+      <div id="reqList"></div>
+      <div class="runbar"><button class="btn primary" id="runBtn" style="flex:1">⚡ Source &amp; AI-match pool</button></div>
+      <div class="runbar" style="border-top:0;padding-top:0"><button class="btn ghost sm" id="screenAllBtn" disabled style="flex:1">🤖 Auto-screen entire pool</button></div>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <h2 id="poolTitle">Candidate Pool</h2>
+        <span id="poolHint" style="font-size:11px;color:var(--slate)">Pick a requirement, then source the pool →</span>
+      </div>
+      <div class="cand-wrap" id="candWrap">
+        <div style="text-align:center;color:var(--slate);padding:38px 10px;font-size:13px">
+          🗂️ No pool loaded yet.<br>Select a requirement on the left and hit <b>“Source &amp; AI-match pool.”</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:18px">
+    <div class="phead"><h2>Live Candidate Pipeline (auto-tagged)</h2>
+      <span style="font-size:11px;color:var(--slate)">Status tags exactly match the Telerecruiter SOP</span></div>
+    <div class="board">
+      <div class="col"><h3>New / Sourced <span class="ct" id="c-new">0</span></h3><div id="col-new"></div></div>
+      <div class="col"><h3>Interested <span class="ct" id="c-int">0</span></h3><div id="col-int"></div></div>
+      <div class="col"><h3>Interview Ready <span class="ct" id="c-rdy">0</span></h3><div id="col-rdy"></div></div>
+      <div class="col"><h3>Call Back <span class="ct" id="c-cb">0</span></h3><div id="col-cb"></div></div>
+      <div class="col"><h3>Not Int. / Elsewhere <span class="ct" id="c-no">0</span></h3><div id="col-no"></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <b>KeyScreen AI</b> — a working proof-of-concept by <b>NEWVORA</b> for Edukey360 (Varun Bahl &amp; Amit ji).<br>
+    Matching &amp; screening logic runs live in your browser on sample data. In production, KeyScreen connects to real resumes,
+    an AI voice/WhatsApp caller, and the Edukey360 dashboard.
+  </footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh"><span class="dot"></span><div><div style="font-weight:800" id="m-name">AI Screening Call</div>
+      <div style="font-size:11px;opacity:.85" id="m-role">KeyScreen AI is calling…</div></div></div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf">
+      <div class="verdict" id="m-verdict"></div>
+      <button class="btn primary sm" id="m-close">Done</button>
+    </div>
+  </div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script>
+const COLORS=['#3d7bd6','#12a58c','#e8a13a','#7a5cd6','#e05b5b','#0e8574','#c0603a','#3f7d2f','#2f6d7d','#b2582f'];
+
+const REQS=[
+  {id:'pgt-phy',role:'PGT Physics',board:'CBSE',grade:'Sr. Secondary',loc:'Gurgaon',band:[45,60],minExp:3,subject:'Physics',
+   must:['M.Sc/B.Sc Physics','B.Ed','CBSE exp'],skills:['physics','b.ed','cbse','senior secondary','pgt']},
+  {id:'tgt-math',role:'TGT Mathematics',board:'ICSE',grade:'Class 6–10',loc:'Gurgaon',band:[30,42],minExp:2,subject:'Mathematics',
+   must:['B.Sc Maths','B.Ed','2+ yrs'],skills:['mathematics','maths','b.ed','tgt','icse']},
+  {id:'prt',role:'PRT (Primary)',board:'CBSE',grade:'Class 1–5',loc:'Delhi NCR',band:[22,30],minExp:1,subject:'Primary',
+   must:['Graduate','D.El.Ed/B.Ed','CTET'],skills:['primary','prt','ctet','b.ed','d.el.ed']},
+  {id:'vp',role:'Vice Principal',board:'CBSE',grade:'Leadership',loc:'Gurgaon',band:[90,120],minExp:10,subject:'Leadership',
+   must:['M.Ed preferred','10+ yrs','Admin exp'],skills:['leadership','administration','m.ed','vice principal','academic']},
+];
+
+const POOL=[
+  {n:'Ananya Sharma',ql:'M.Sc Physics, B.Ed',subj:'Physics',exp:5,boards:['CBSE'],loc:'Gurgaon',cur:42,exp_ctc:52,notice:'30 days',skills:['physics','b.ed','cbse','pgt','senior secondary']},
+  {n:'Rahul Verma',ql:'B.Sc Physics, B.Ed',subj:'Physics',exp:2,boards:['State'],loc:'Faridabad',cur:30,exp_ctc:46,notice:'60 days',skills:['physics','b.ed','tgt']},
+  {n:'Meera Nair',ql:'M.Sc Physics, B.Ed',subj:'Physics',exp:8,boards:['CBSE','ICSE'],loc:'Gurgaon',cur:58,exp_ctc:80,notice:'90 days',skills:['physics','b.ed','cbse','pgt','senior secondary']},
+  {n:'Sunita Rao',ql:'B.Sc Maths, B.Ed',subj:'Mathematics',exp:3,boards:['ICSE'],loc:'Gurgaon',cur:28,exp_ctc:38,notice:'Immediate',skills:['mathematics','maths','b.ed','tgt','icse']},
+  {n:'Imran Khan',ql:'M.Sc Maths, B.Ed',subj:'Mathematics',exp:4,boards:['CBSE'],loc:'Delhi',cur:34,exp_ctc:44,notice:'30 days',skills:['mathematics','maths','b.ed','tgt']},
+  {n:'Priya Menon',ql:'B.A, D.El.Ed, CTET',subj:'Primary',exp:2,boards:['CBSE'],loc:'Delhi',cur:20,exp_ctc:27,notice:'Immediate',skills:['primary','prt','ctet','d.el.ed']},
+  {n:'Kavya Iyer',ql:'B.Com, B.Ed, CTET',subj:'Primary',exp:1,boards:['CBSE'],loc:'Noida',cur:18,exp_ctc:24,notice:'15 days',skills:['primary','prt','ctet','b.ed']},
+  {n:'Deepak Joshi',ql:'M.Ed, 12 yrs admin',subj:'Leadership',exp:12,boards:['CBSE'],loc:'Gurgaon',cur:95,exp_ctc:118,notice:'90 days',skills:['leadership','administration','m.ed','vice principal','academic']},
+  {n:'Neha Gupta',ql:'M.A, B.Ed',subj:'Mathematics',exp:2,boards:['State'],loc:'Gurgaon',cur:26,exp_ctc:33,notice:'30 days',gone:true,skills:['mathematics','b.ed','tgt']},
+  {n:'Arjun Reddy',ql:'B.Sc Physics, B.Ed',subj:'Physics',exp:6,boards:['CBSE'],loc:'Gurgaon',cur:44,exp_ctc:55,notice:'45 days',skills:['physics','b.ed','cbse','pgt']},
+];
+
+let selReq=null, matched=[], stats={screened:0,calls:0,ready:0};
+const $=id=>document.getElementById(id);
+
+function initials(n){return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+function flash(t){const f=$('flash');f.textContent=t;f.classList.add('on');clearTimeout(f._t);f._t=setTimeout(()=>f.classList.remove('on'),2600);}
+
+/* MATCH ENGINE — runs live in browser */
+function scoreCandidate(c,r){
+  let s=0, reasons=[];
+  if(c.subj===r.subject){s+=42;reasons.push('subject fit');}
+  else if(r.subject!=='Leadership'){s+=3;}
+  const overlap=c.skills.filter(k=>r.skills.includes(k)).length;
+  s+=Math.min(overlap*7,28); if(overlap>=3)reasons.push(overlap+' skill matches');
+  if(c.exp>=r.minExp){s+=14;reasons.push(c.exp+' yrs exp');} else {s+=Math.round(c.exp/r.minExp*8);}
+  if(c.boards.includes(r.board)){s+=9;reasons.push(r.board+' board');}
+  const near=c.loc===r.loc||(r.loc==='Delhi NCR'&&['Delhi','Noida','Gurgaon','Faridabad'].includes(c.loc));
+  if(near){s+=7;reasons.push('local');}
+  if(c.exp_ctc<=r.band[1]*1.1){s+=6;reasons.push('within salary band');}
+  return {score:Math.max(4,Math.min(Math.round(s),99)),reasons};
+}
+function scoreColor(s){return s>=75?'#12a58c':s>=55?'#3d7bd6':s>=40?'#e8a13a':'#e05b5b';}
+
+/* SCREENING OUTCOME */
+function outcome(c,r,score){
+  if(c.gone) return {key:'else',label:'Joined Elsewhere',cls:'st-else',col:'no',verdict:'🚪 Already joined another school — auto-archived.'};
+  if(c.subj!==r.subject && r.subject!=='Leadership') return {key:'no',label:'Not Interested',cls:'st-no',col:'no',verdict:'❌ Not a subject fit — politely declined.'};
+  if(c.exp_ctc>r.band[1]*1.15) return {key:'cb',label:'Call Back',cls:'st-cb',col:'cb',verdict:'💬 Expected CTC above band — flagged for negotiation.'};
+  if(score>=70 && c.exp_ctc<=r.band[1]*1.1) return {key:'rdy',label:'Interview Ready',cls:'st-rdy',col:'rdy',verdict:'✅ Qualified & in-band — auto-shortlisted for interview.'};
+  return {key:'int',label:'Interested',cls:'st-int',col:'int',verdict:'👍 Interested & relevant — moving forward.'};
+}
+
+/* RENDER REQUIREMENTS */
+function renderReqs(){
+  $('reqList').innerHTML=REQS.map(r=>`
+    <div class="req ${selReq&&selReq.id===r.id?'active':''}" data-id="${r.id}">
+      <div class="r-role">${r.role}</div>
+      <div class="r-meta">${r.board} · ${r.grade} · ${r.loc} · ₹${r.band[0]}–${r.band[1]}k/mo</div>
+      <div class="r-tags">${r.must.map(m=>`<span class="tag must">${m}</span>`).join('')}</div>
+    </div>`).join('');
+  document.querySelectorAll('.req').forEach(el=>el.onclick=()=>{selReq=REQS.find(x=>x.id===el.dataset.id);renderReqs();$('poolHint').textContent='Ready — hit “Source & AI-match pool.”';});
+}
+
+/* RUN MATCH */
+function runMatch(){
+  if(!selReq){flash('Pick a requirement first ☝️');return;}
+  matched=POOL.map(c=>{const m=scoreCandidate(c,selReq);return {...c,score:m.score,reasons:m.reasons,screened:false,st:null};})
+    .filter(c=>c.score>=35).sort((a,b)=>b.score-a.score);
+  $('poolTitle').textContent=`Candidate Pool — ${selReq.role} (${matched.length} matched)`;
+  $('poolHint').textContent='AI parsed resumes & ranked by fit ✓';
+  $('screenAllBtn').disabled=false;
+  renderCands();
+  // seed pipeline "new" column
+  renderBoardNew();
+  flash(`⚡ ${matched.length} resumes parsed & ranked for ${selReq.role}`);
+}
+
+function renderCands(){
+  if(!matched.length){$('candWrap').innerHTML='<div style="text-align:center;color:var(--slate);padding:30px">No strong matches ≥35% for this JD in the sample pool.</div>';return;}
+  $('candWrap').innerHTML=matched.map((c,i)=>`
+    <div class="cand" style="animation-delay:${i*60}ms">
+      <div class="avatar" style="background:${COLORS[i%COLORS.length]}">${initials(c.n)}</div>
+      <div>
+        <div class="nm">${c.n} ${c.st?`<span class="status ${c.st.cls}">${c.st.label}</span>`:''}</div>
+        <div class="ql">${c.ql}</div>
+        <div class="fields">
+          <span class="field">📚 <b>${c.subj}</b></span>
+          <span class="field">🎯 <b>${c.exp} yrs</b></span>
+          <span class="field">🏫 ${c.boards.join('/')}</span>
+          <span class="field">📍 ${c.loc}</span>
+          <span class="field">💰 cur <b>₹${c.cur}k</b></span>
+          <span class="field">📈 exp <b>₹${c.exp_ctc}k</b></span>
+          <span class="field">⏳ ${c.notice}</span>
+        </div>
+        <div class="why">🔎 <b>Why matched:</b> ${c.reasons.join(' · ')||'partial fit'}</div>
+      </div>
+      <div class="scorebox">
+        <div class="ring" style="background:conic-gradient(${scoreColor(c.score)} ${c.score}%, #e9efed 0)"><span>${c.score}%</span></div>
+        <div class="lab">MATCH</div>
+      </div>
+      <div class="cactions">
+        <button class="btn primary sm" data-scr="${i}" ${c.screened?'disabled':''}>🤖 AI Screen</button>
+        <button class="btn ghost sm" data-wa="${i}">📲 WhatsApp msg</button>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-scr]').forEach(b=>b.onclick=()=>screenOne(+b.dataset.scr));
+  document.querySelectorAll('[data-wa]').forEach(b=>b.onclick=()=>showWA(+b.dataset.wa));
+}
+
+/* WHATSAPP */
+function waText(c){
+  const f=c.n.split(' ')[0];
+  return `Hi ${f}! 👋 This is Edukey360 (verified school staffing).\n\nWe have a *${selReq.role}* opening — ${selReq.board}, ${selReq.loc}, ₹${selReq.band[0]}–${selReq.band[1]}k/mo.\n\nYour profile (${c.ql}, ${c.exp} yrs) looks like a strong fit. Are you open to it?\nReply YES and we'll schedule your interview. 🎓`;
+}
+function showWA(i){
+  const c=matched[i];
+  $('m-name').textContent='WhatsApp outreach — '+c.n;
+  $('m-role').textContent='Auto-personalised by KeyScreen AI';
+  $('m-body').innerHTML=`<div class="wa">${waText(c)}</div><div style="font-size:11.5px;color:var(--slate);margin-top:10px">In production this fires automatically via the WhatsApp Business API — no recruiter typing required.</div>`;
+  $('m-verdict').textContent='';
+  $('overlay').classList.add('on');
+}
+
+/* SCREENING CALL (animated) */
+function buildTranscript(c,r){
+  const f=c.n.split(' ')[0];
+  const lines=[
+    ['ai',`Hi ${f}, this is Maya from Edukey360 — calling about a ${r.role} opening at a ${r.board} school in ${r.loc}. Got 2 minutes?`],
+    ['ca',`Yes, please go ahead.`],
+    ['ai',`Great! I see you're a ${c.ql} with ${c.exp} years' experience. Are you open to a new opportunity right now?`],
+    ['ca', c.gone?`Actually I just accepted an offer at another school last week.` : `Yes, I'm actively looking.`],
+  ];
+  if(!c.gone){
+    lines.push(['ai',`Perfect. Can you confirm your current monthly CTC?`]);
+    lines.push(['ca',`It's ₹${c.cur},000 per month.`]);
+    lines.push(['ai',`And your expected CTC?`]);
+    lines.push(['ca',`Around ₹${c.exp_ctc},000.`]);
+    lines.push(['ai',`Noted. What's your notice period, and are you comfortable with ${r.loc}?`]);
+    lines.push(['ca',`${c.notice}, and yes ${r.loc} works for me.`]);
+  }
+  return lines;
+}
+function screenOne(i){
+  const c=matched[i], r=selReq;
+  const res=outcome(c,r,c.score);
+  const lines=buildTranscript(c,r);
+  $('m-name').textContent=c.n;
+  $('m-role').textContent=`KeyScreen AI · screening for ${r.role}`;
+  $('m-body').innerHTML=''; $('m-verdict').textContent='';
+  $('overlay').classList.add('on');
+  let k=0;
+  (function step(){
+    if(k<lines.length){
+      const [who,txt]=lines[k];
+      const d=document.createElement('div');
+      d.className='msg '+who;
+      d.innerHTML=`<div class="who">${who==='ai'?'🤖 Maya':'👤 '+c.n.split(' ')[0]}</div><div class="bubble">${txt}</div>`;
+      $('m-body').appendChild(d); $('m-body').scrollTop=$('m-body').scrollHeight;
+      k++; setTimeout(step, 620);
+    } else {
+      $('m-verdict').innerHTML=`<span style="color:var(--teal-d)">Auto-tagged:</span> ${res.verdict}`;
+      applyResult(i,res);
+    }
+  })();
+}
+function applyResult(i,res){
+  const c=matched[i];
+  if(c.screened) return;
+  c.screened=true; c.st=res;
+  stats.screened++; stats.calls++; if(res.key==='rdy')stats.ready++;
+  updateKPIs(); renderCands(); addToBoard(c,res);
+}
+
+/* SCREEN ALL */
+function screenAll(){
+  if(!matched.length){flash('Source a pool first');return;}
+  let did=0;
+  matched.forEach((c,i)=>{ if(!c.screened){const res=outcome(c,selReq,c.score);applyResult(i,res);did++;} });
+  flash(did?`🤖 Auto-screened ${did} candidates in ~2 seconds`:'All already screened');
+}
+
+/* KPIs */
+function updateKPIs(){
+  $('k-screened').textContent=stats.screened;
+  $('k-calls').textContent=stats.calls;
+  $('k-hours').textContent=(stats.calls*8/60).toFixed(1)+'h';
+  $('k-ready').textContent=stats.ready;
+}
+
+/* BOARD */
+function renderBoardNew(){
+  $('col-new').innerHTML=matched.filter(c=>!c.screened).map(c=>pcard(c,c.score+'% match')).join('');
+  countBoard();
+}
+function pcard(c,meta){return `<div class="pcard">${c.n}<div class="m">${meta}</div></div>`;}
+function addToBoard(c,res){
+  renderBoardNew();
+  const map={int:'col-int',rdy:'col-rdy',cb:'col-cb',no:'col-no',else:'col-no'};
+  const el=$(map[res.col]||map[res.key]);
+  if(el) el.insertAdjacentHTML('afterbegin',pcard(c,res.label));
+  countBoard();
+}
+function countBoard(){
+  $('c-new').textContent=$('col-new').children.length;
+  $('c-int').textContent=$('col-int').children.length;
+  $('c-rdy').textContent=$('col-rdy').children.length;
+  $('c-cb').textContent=$('col-cb').children.length;
+  $('c-no').textContent=$('col-no').children.length;
+}
+
+$('runBtn').onclick=runMatch;
+$('screenAllBtn').onclick=screenAll;
+$('m-close').onclick=()=>$('overlay').classList.remove('on');
+$('overlay').onclick=e=>{if(e.target===$('overlay'))$('overlay').classList.remove('on');};
+renderReqs();
+</script>
+</body>
+</html>
