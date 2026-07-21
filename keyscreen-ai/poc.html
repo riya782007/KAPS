@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="KeyScreen AI — an AI Recruiter Copilot for Edukey360 that auto-sources, AI-matches, AI-screens and auto-tags candidates. Built by NEWVORA.">
+<title>KeyScreen AI — Edukey360 · by NEWVORA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">🎓</div>
+      <div>
+        <h1>KeyScreen AI <span class="hsub">· Edukey360 Recruiter Copilot</span></h1>
+        <div class="sub">Auto-source → AI-match → AI-screen → auto-tag. The recruiter grunt-work, done for you.</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="plan.html" style="font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;text-decoration:none">📋 Plan</a>
+      <a href="modules.html" style="font-size:12px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;text-decoration:none">🔬 Deep Dive</a>
+      <div class="byline">POWERED BY NEWVORA</div>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="k-screened">0</div><div class="l">Candidates AI-screened</div><div class="chip">vs. 40–50 manual calls/recruiter/day</div></div>
+    <div class="kpi"><div class="n" id="k-calls">0</div><div class="l">Screening calls automated</div><div class="chip">no telecaller needed</div></div>
+    <div class="kpi"><div class="n" id="k-hours">0.0h</div><div class="l">Recruiter-hours saved</div><div class="chip">~8 min saved / call</div></div>
+    <div class="kpi"><div class="n" id="k-ready">0</div><div class="l">Interview-ready shortlist</div><div class="chip">auto-qualified</div></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel side">
+      <h2>Live Requirements (JDs)</h2>
+      <div id="reqList"></div>
+      <div class="runbar"><button class="btn primary" id="runBtn" style="flex:1">⚡ Source &amp; AI-match pool</button></div>
+      <div class="runbar notop"><button class="btn ghost sm" id="screenAllBtn" disabled style="flex:1">🤖 Auto-screen entire pool</button></div>
+    </div>
+
+    <div class="panel">
+      <div class="phead">
+        <h2 id="poolTitle">Candidate Pool</h2>
+        <span id="poolHint" class="hint">Pick a requirement, then source the pool →</span>
+      </div>
+      <div class="cand-wrap" id="candWrap">
+        <div class="empty">🗂️ No pool loaded yet.<br>Select a requirement on the left and hit <b>“Source &amp; AI-match pool.”</b></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel board-panel">
+    <div class="phead"><h2>Live Candidate Pipeline (auto-tagged)</h2>
+      <span class="hint">Status tags exactly match the Telerecruiter SOP</span></div>
+    <div class="board">
+      <div class="col"><h3>New / Sourced <span class="ct" id="c-new">0</span></h3><div id="col-new"></div></div>
+      <div class="col"><h3>Interested <span class="ct" id="c-int">0</span></h3><div id="col-int"></div></div>
+      <div class="col"><h3>Interview Ready <span class="ct" id="c-rdy">0</span></h3><div id="col-rdy"></div></div>
+      <div class="col"><h3>Call Back <span class="ct" id="c-cb">0</span></h3><div id="col-cb"></div></div>
+      <div class="col"><h3>Not Int. / Elsewhere <span class="ct" id="c-no">0</span></h3><div id="col-no"></div></div>
+    </div>
+  </div>
+
+  <footer>
+    <b>KeyScreen AI</b> — a working proof-of-concept by <b>NEWVORA</b> for Edukey360 (Varun Bahl &amp; Amit ji).<br>
+    Matching &amp; screening logic runs live in your browser on sample data. In production, KeyScreen connects to real resumes,
+    an AI voice/WhatsApp caller, and the Edukey360 dashboard.
+  </footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh"><span class="dot"></span><div><div class="mtitle" id="m-name">AI Screening Call</div>
+      <div class="mrole" id="m-role">KeyScreen AI is calling…</div></div></div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf">
+      <div class="verdict" id="m-verdict"></div>
+      <button class="btn primary sm" id="m-close">Done</button>
+    </div>
+  </div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

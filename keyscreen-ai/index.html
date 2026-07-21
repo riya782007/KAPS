@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Edukey360 Agentic Recruiting OS — one connected system (Candidate Knowledge Graph) automating sourcing, matching, AI screening, verification, the school portal and ops intelligence. Built by NEWVORA.">
+<title>Edukey360 · Agentic Recruiting OS — by NEWVORA</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="side" id="side">
+    <div class="brand">
+      <div class="lg">🎓</div>
+      <div><h1>Edukey360 OS</h1><div class="sub">Agentic Recruiting</div></div>
+    </div>
+    <nav class="nav" id="nav">
+      <div class="lbl">Operate</div>
+      <a data-view="dashboard" class="active"><span class="ic">📊</span> Dashboard <span class="pip" id="pip-open"></span></a>
+      <a data-view="requirements"><span class="ic">📋</span> Requirements</a>
+      <a data-view="sourcing"><span class="ic">📡</span> Sourcing</a>
+      <div class="lbl">AI Engine</div>
+      <a data-view="match"><span class="ic">🎯</span> Match</a>
+      <a data-view="screen"><span class="ic">🤖</span> KeyScreen</a>
+      <a data-view="verify"><span class="ic">🔒</span> Verification</a>
+      <div class="lbl">Grow</div>
+      <a data-view="portal"><span class="ic">🏫</span> School Portal</a>
+      <a data-view="candidates"><span class="ic">🧠</span> Knowledge Graph</a>
+    </nav>
+    <div class="foot">One shared data core.<br>Built by <b>NEWVORA</b>.<br><a href="plan.html" style="color:#7fe9d3">Plan</a> · <a href="modules.html" style="color:#7fe9d3">Deep Dive</a></div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="top">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div><h2 id="viewTitle">Dashboard</h2><div class="crumb" id="viewCrumb">Founder cockpit · live from the shared data core</div></div>
+      <div class="search"><input id="globalSearch" placeholder="Search candidates…"></div>
+      <div class="links"><a href="plan.html">📋 Plan</a><a href="modules.html">🔬 Deep Dive</a></div>
+    </div>
+    <div class="view" id="view"></div>
+  </div>
+</div>
+
+<!-- Candidate 360 drawer -->
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer"><div class="dh" id="drawerHead"></div><div class="db" id="drawerBody"></div></aside>
+
+<!-- Screening modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="mh"><span class="dot"></span><div><div style="font-weight:800" id="mName">AI Screening</div><div style="font-size:11px;opacity:.85" id="mRole"></div></div></div>
+    <div class="mb" id="mBody"></div>
+    <div class="mf"><div class="verdict" id="mVerdict"></div><button class="btn primary sm" id="mClose">Done</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/seed.js"></script>
+<script src="js/store.js"></script>
+<script src="js/views.js"></script>
+</body>
+</html>

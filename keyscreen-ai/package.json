@@ -1,0 +1,13 @@
+{
+  "name": "keyscreen-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "KeyScreen AI — an AI Recruiter Copilot for Edukey360. Auto-source, AI-match, AI-screen and auto-tag candidates. A NEWVORA proof-of-concept.",
+  "keywords": ["edukey360", "newvora", "recruitment", "ai", "edtech", "staffing"],
+  "author": "NEWVORA",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  }
+}
