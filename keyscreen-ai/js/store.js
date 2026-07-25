@@ -55,6 +55,7 @@
     state.activity.unshift({ t: Date.now(), text, candId: candId || null });
     if (candId) { const c = cand(candId); if (c) c.timeline.unshift({ t: Date.now(), e: text }); }
   }
+  function fireEvt(event, payload) { try { if (window.Integrations) window.Integrations.fire(event, payload); } catch (e) {} }
 
   /* ---------- MATCH ENGINE (hybrid: fit + retention) ---------- */
   function scoreFit(c, r) {
@@ -129,6 +130,7 @@
     c.lastContact = Date.now();
     state.meta.callsAutomated += 1;
     log(`AI-screened for ${r.role} → ${o.status}`, candId);
+    fireEvt('screen', { candidateId: candId, name: c.name, subject: c.subject, exp: c.exp, expectedCTC: c.exp_ctc, requirement: r.role, outcome: o.status });
     emit();
     return o;
   }
@@ -139,6 +141,7 @@
     if (c.status === STATUS.NEW) c.status = STATUS.SOURCED;
     c.lastContact = Date.now();
     log(`Re-engaged via ${c.source === 'WhatsApp' ? 'WhatsApp' : 'WhatsApp + voice'}`, candId);
+    fireEvt('outreach', { candidateId: candId, name: c.name, channel: c.source });
     emit();
   }
   function verify(candId, toTier) {
@@ -147,6 +150,7 @@
     c.trust = toTier;
     const how = toTier === 2 ? 'blockchain (DigiLocker/AICTE)' : 'document check';
     log(`Verified → ${TRUST[toTier]} via ${how}`, candId);
+    fireEvt('verify', { candidateId: candId, name: c.name, tier: toTier, tierName: TRUST[toTier] });
     emit();
   }
   function setConsent(candId, val) { const c = cand(candId); if (c){ c.consent = val; log('Consent '+(val?'granted':'revoked'), candId); emit(); } }
@@ -158,6 +162,7 @@
     const fee = Math.round(c.exp_ctc * 1000 * 0.4); // illustrative placement fee
     state.billing.unshift({ t: Date.now(), candId, reqId, amount: fee, model: 'Model 1 · on deployment' });
     log(`Placed at ${school(r.schoolId).name} — invoice ₹${fee.toLocaleString('en-IN')} auto-raised`, candId);
+    fireEvt('place', { candidateId: candId, name: c.name, school: school(r.schoolId).name, requirement: r.role, fee });
     emit();
   }
   function addCandidate(obj) {
@@ -167,6 +172,7 @@
     c.timeline = [{ t: Date.now(), e: 'Added via ' + c.source }];
     state.candidates.push(c);
     log(`New candidate sourced: ${c.name}`, id);
+    fireEvt('candidate', { candidateId: id, name: c.name, subject: c.subject, exp: c.exp, source: c.source });
     emit();
     return c;
   }

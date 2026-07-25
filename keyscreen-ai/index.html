@@ -28,8 +28,10 @@
       <div class="lbl">Grow</div>
       <a data-view="portal"><span class="ic">🏫</span> School Portal</a>
       <a data-view="candidates"><span class="ic">🧠</span> Knowledge Graph</a>
+      <div class="lbl">System</div>
+      <a data-view="settings"><span class="ic">⚙️</span> Integrations</a>
     </nav>
-    <div class="foot">One shared data core.<br>Built by <b>NEWVORA</b>.<br><a href="plan.html" style="color:#7fe9d3">Plan</a> · <a href="modules.html" style="color:#7fe9d3">Deep Dive</a></div>
+    <div class="foot">One shared data core.<br>Built by <b>NEWVORA</b>.<br><a href="plan.html" target="_blank" rel="noopener" style="color:#7fe9d3">Plan</a> · <a href="modules.html" target="_blank" rel="noopener" style="color:#7fe9d3">Deep Dive</a></div>
   </aside>
 
   <!-- MAIN -->
@@ -38,7 +40,7 @@
       <button class="menu-btn" id="menuBtn">☰</button>
       <div><h2 id="viewTitle">Dashboard</h2><div class="crumb" id="viewCrumb">Founder cockpit · live from the shared data core</div></div>
       <div class="search"><input id="globalSearch" placeholder="Search candidates…"></div>
-      <div class="links"><a href="plan.html">📋 Plan</a><a href="modules.html">🔬 Deep Dive</a></div>
+      <div class="links"><a id="playBtn" style="background:var(--teal);color:#fff;border-color:var(--teal)">▶ Guided demo</a><a href="plan.html" target="_blank" rel="noopener">📋 Plan</a><a href="modules.html" target="_blank" rel="noopener">🔬 Deep Dive</a></div>
     </div>
     <div class="view" id="view"></div>
   </div>
@@ -57,9 +59,14 @@
   </div>
 </div>
 
+<div class="story" id="storyIntro"></div>
+<div class="story" id="storyFinale"></div>
+<div class="confetti" id="confetti"></div>
+<div class="coach" id="coach"></div>
 <div class="toast" id="toast"></div>
 
 <script src="js/seed.js"></script>
+<script src="js/integrations.js"></script>
 <script src="js/store.js"></script>
 <script src="js/views.js"></script>
 </body>

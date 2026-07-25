@@ -223,6 +223,31 @@
     ${cs.map(c=>crow(c, `<span class="muted" style="font-size:11px">${c.timeline.length} events</span>`)).join('') || `<div class="empty">No candidates match “${App.search}”.</div>`}`;
   }
 
+  function vSettings(){
+    const cfg = window.Integrations ? window.Integrations.get() : {live:false,urls:{}};
+    const fields = [
+      ['outreach','📲 Outreach — WhatsApp / voice re-engage'],
+      ['screen','🤖 AI Screening — Claude + voice/WhatsApp call'],
+      ['verify','🔒 Verification — KYC / DigiLocker / blockchain'],
+      ['place','🎓 Placement — invoice (Razorpay) + onboarding'],
+      ['candidate','📄 New candidate — resume parse + enrich']
+    ];
+    return `<div class="card pad" style="margin-bottom:14px">
+      <b>⚙️ Make it real — n8n + AI</b>
+      <p class="muted" style="font-size:12.5px;margin-top:5px">Paste your <b>n8n webhook URLs</b>. With <b>Live mode ON</b>, each action in this app fires the matching n8n workflow — which runs the real automation (Claude for matching/screening, WhatsApp, voice, KYC, Razorpay). Your API keys live safely in <b>n8n credentials</b>, never in this frontend. Keep Live <b>OFF</b> for the Monday demo — everything still works on seed data.</p>
+      <div style="margin-top:8px"><span class="st ${cfg.live?'st-Placed':'st-New'}">${cfg.live?'● LIVE MODE ON':'○ Demo mode (offline)'}</span></div>
+    </div>
+    <div class="card pad">
+      <div class="row-between" style="margin-bottom:12px">
+        <div class="h-sec" style="margin:0">Webhook endpoints</div>
+        <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:700;cursor:pointer"><input type="checkbox" id="liveToggle" ${cfg.live?'checked':''}> Live mode</label>
+      </div>
+      ${fields.map(([k,label])=>`<div class="field"><label>${label}</label><div style="display:flex;gap:6px"><input id="wh_${k}" value="${(cfg.urls[k]||'').replace(/"/g,'&quot;')}" placeholder="https://your-n8n.app/webhook/${k}"><button class="btn line sm" data-act="testWebhook" data-ev="${k}">Test</button></div></div>`).join('')}
+      <button class="btn primary sm" data-act="saveIntegrations">💾 Save integrations</button>
+      <p class="muted" style="font-size:11.5px;margin-top:10px">Full setup, payloads &amp; where to paste AI keys → <b>docs/N8N_INTEGRATION.md</b> in the repo.</p>
+    </div>`;
+  }
+
   /* ---------- Portal search helpers ---------- */
   function parseQuery(q){
     q=(q||'').toLowerCase();
@@ -312,12 +337,13 @@
     screen:['KeyScreen','Autonomous AI voice/WhatsApp screening'],
     verify:['Verification','The Trust Layer · verify once, reuse everywhere'],
     portal:['School Portal','Self-service verified pool · Model 3'],
-    candidates:['Knowledge Graph','Every candidate node, shared across modules']};
+    candidates:['Knowledge Graph','Every candidate node, shared across modules'],
+    settings:['Integrations','Connect n8n webhooks + AI to make it real']};
   function setView(v){ App.view=v; document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===v)); $('side').classList.remove('on'); render(); }
   function render(){
     const [t,c]=TITLES[App.view]||TITLES.dashboard; $('viewTitle').textContent=t; $('viewCrumb').textContent=c;
     $('pip-open').textContent=S.kpis().activeReqs;
-    const map={dashboard:vDashboard,requirements:vRequirements,sourcing:vSourcing,match:vMatch,screen:vScreen,verify:vVerify,portal:vPortal,candidates:vCandidates};
+    const map={dashboard:vDashboard,requirements:vRequirements,sourcing:vSourcing,match:vMatch,screen:vScreen,verify:vVerify,portal:vPortal,candidates:vCandidates,settings:vSettings};
     $('view').innerHTML=(map[App.view]||vDashboard)();
     if(App.drawerId && $('drawer').classList.contains('on')) renderDrawer();
   }
@@ -340,7 +366,7 @@
       case 'toggleReqForm': { const f=$('reqForm'); f.style.display=f.style.display==='none'?'block':'none'; break; }
       case 'screen': screenModal(id,reqId); break;
       case 'screenall': { const list=S.matchFor(reqId); let n=0; list.forEach(x=>{ if(!x.c.screening){ S.commitScreen(x.c.id,reqId); n++; } }); toast(`🤖 Auto-screened ${n} candidates`); break; }
-      case 'place': S.place(id,reqId); toast('🎓 Placed — invoice auto-raised & retention scored'); break;
+      case 'place': S.place(id,reqId); confetti(); toast('🎓 Placed — invoice auto-raised & retention scored'); break;
       case 'verify': S.verify(id,+el.dataset.tier); toast('🔒 Verification updated across all modules'); break;
       case 'reengage': S.sourceReengage(id); toast('📲 Re-engaged via WhatsApp'); break;
       case 'consent': S.setConsent(id, el.dataset.val==='1'); toast('Consent updated'); break;
@@ -361,13 +387,131 @@
       }
       case 'portalSearch': App.portalQ=val('portalInput'); render(); break;
       case 'portalChip': App.portalQ=el.dataset.q; render(); break;
+      case 'startDemo': startDemo(); break;
+      case 'stopDemo': stopDemo(); break;
+      case 'beginWalk': beginWalk(); break;
+      case 'skipToResults': skipToResults(); break;
+      case 'closeStory': hideStory(); break;
+      case 'saveIntegrations': {
+        if(window.Integrations){ ['outreach','screen','verify','place','candidate'].forEach(k=>window.Integrations.setUrl(k, val('wh_'+k))); const lt=$('liveToggle'); window.Integrations.setLive(lt && lt.checked); }
+        toast('✅ Integrations saved'); render(); break;
+      }
+      case 'testWebhook': {
+        const ev=el.dataset.ev, u=val('wh_'+ev);
+        if(!u){ toast('Enter a webhook URL first'); break; }
+        fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:ev,test:true,source:'edukey360-os',ts:Date.now()})})
+          .then(()=>toast('📡 Test payload sent to the '+ev+' webhook'))
+          .catch(()=>toast('⚠ Could not reach webhook — check the URL / n8n CORS'));
+        break;
+      }
     }
+  }
+
+  /* ================= GUIDED DEMO ("Play") — 3-act story ================= */
+  const DEMO = [
+    { say:"Meet the Edukey360 OS — one system on a single shared Knowledge Graph. Watch it fill a real vacancy end-to-end, hands-free.", run:()=>{ S.reset(); setView('dashboard'); }, wait:3200 },
+    { say:"Step 1 · Sourcing. Instead of manual dialing, the AI re-engages a teacher from the pool over WhatsApp.", run:()=>{ setView('sourcing'); }, wait:2400 },
+    { run:()=>{ S.sourceReengage('c1'); }, wait:1900 },
+    { say:"Step 2 · Match. It ranks by Fit + predicted Stay, with plain-English reasons — Ananya tops PGT Physics.", run:()=>{ App.selReq='r1'; setView('match'); }, wait:3500 },
+    { say:"Step 3 · KeyScreen. An adaptive AI voice call collects every detail and auto-tags the outcome — no telecaller, no script fatigue.", run:()=>{ screenModal('c1','r1'); }, wait:7000 },
+    { run:()=>{ $('overlay').classList.remove('on'); }, wait:800 },
+    { say:"Step 4 · Verification. Instant, reusable trust — one blockchain-verified badge, trusted across every module.", run:()=>{ setView('verify'); S.verify('c1',2); }, wait:3300 },
+    { say:"Step 5 · Place. The vacancy fills, an invoice auto-raises, and the system predicts this teacher's retention risk.", run:()=>{ S.place('c1','r1'); confetti(); }, wait:3300 },
+    { say:"And it never stops at one — KeyScreen clears the entire shortlist in seconds.", run:()=>{ App.selReq='r1'; setView('screen'); S.matchFor('r1').forEach(x=>{ if(!x.c.screening) S.commitScreen(x.c.id,'r1'); }); }, wait:3400 },
+    { say:"That was a full week of manual calling — done in a minute. Here's what your team just got back.", run:()=>{ setView('dashboard'); }, wait:3200 },
+    { run:()=>{ hideCoach(); showFinale(); }, last:true, wait:0 }
+  ];
+  let demoOn=false, demoIdx=0, demoTimer=null, lastSay='';
+  const STEPS = DEMO.filter(s=>s.say).length;
+  function setCoach(){
+    const shown = DEMO.slice(0,demoIdx+1).filter(s=>s.say).length;
+    $('coach').innerHTML = `<div class="txt"><div class="step">GUIDED DEMO · STEP ${Math.min(shown,STEPS)} / ${STEPS}</div><div class="say">${lastSay}</div></div>
+      <div class="btns"><button class="stop" data-act="stopDemo">Stop</button></div>`;
+  }
+  function hideCoach(){ $('coach').classList.remove('on'); }
+  function stepDemo(){
+    if(!demoOn) return;
+    if(demoIdx>=DEMO.length){ demoOn=false; return; }
+    const s=DEMO[demoIdx];
+    if(s.say) lastSay=s.say;
+    if(!s.last){ $('coach').classList.add('on'); setCoach(); }
+    try{ s.run && s.run(); }catch(e){}
+    const w=s.wait||2200; demoIdx++;
+    if(!s.last) demoTimer=setTimeout(stepDemo, w);
+  }
+  function startDemo(){ stopDemo(); showIntro(); }
+  function beginWalk(){ hideStory(); demoOn=true; demoIdx=0; lastSay=''; stepDemo(); }
+  function skipToResults(){
+    hideStory(); demoOn=false; clearTimeout(demoTimer);
+    S.reset(); S.sourceReengage('c1'); S.commitScreen('c1','r1'); S.verify('c1',2); S.place('c1','r1');
+    S.matchFor('r1').forEach(x=>{ if(!x.c.screening) S.commitScreen(x.c.id,'r1'); });
+    setView('dashboard'); showFinale();
+  }
+  function stopDemo(){ demoOn=false; clearTimeout(demoTimer); hideCoach(); $('overlay').classList.remove('on'); hideStory(); }
+  function hideStory(){ $('storyIntro').classList.remove('on'); $('storyFinale').classList.remove('on'); }
+
+  function showIntro(){
+    $('storyIntro').innerHTML = `<div class="inner">
+      <div class="eyebrow">Edukey360 · powered by NEWVORA</div>
+      <h2>A week in your recruitment team — today</h2>
+      <p class="sub">This is the work quietly draining your people, every single day:</p>
+      <ul class="pains">
+        <li><span class="x">📞</span> 40–50 screening calls per recruiter, every single day</li>
+        <li><span class="x">🔁</span> The same 7 questions, asked hundreds of times over</li>
+        <li><span class="x">📋</span> Manual trackers, human errors, missed follow-ups</li>
+        <li><span class="x">👻</span> Great teachers who ghost — discovered far too late</li>
+      </ul>
+      <div class="cta">
+        <button class="go" data-act="beginWalk">▶ Show me the other way</button>
+        <button class="skip" data-act="skipToResults">Skip to the results</button>
+      </div>
+    </div>`;
+    $('storyIntro').classList.add('on');
+  }
+
+  function showFinale(){
+    const k=S.kpis(); const calls=k.callsAutomated||0, hours=k.hoursSaved||0, rev=k.revenue||0;
+    const monthly=Math.max(1, Math.round(hours*25));
+    $('storyFinale').innerHTML = `<div class="inner">
+      <div class="eyebrow">The result</div>
+      <h2>Your team just got its time back</h2>
+      <p class="sub">One vacancy — sourced, screened, verified, placed and billed — with almost no human effort.</p>
+      <div class="tiles">
+        <div class="tile"><div class="n" data-to="${calls}" data-dur="1100">0</div><div class="l">screening calls automated</div></div>
+        <div class="tile"><div class="n" data-to="${hours}" data-dur="1200" data-dec="1" data-suf="h">0</div><div class="l">recruiter-hours saved</div></div>
+        <div class="tile"><div class="n" data-to="${rev}" data-dur="1300" data-pre="₹">0</div><div class="l">auto-billed, zero manual invoicing</div></div>
+      </div>
+      <div class="proj">📈 At ~25 hires a month, that's ≈ <b>${monthly} recruiter-hours</b> back every month — roughly a full desk freed from dialing, so your team screens smarter and closes more.</div>
+      <div class="close-line">No monotony. No repetitive scripts. No manual trackers. No missed follow-ups.<br>Just your team — doing the work only humans can.</div>
+      <div class="cta">
+        <button class="go" data-act="startDemo">▶ Replay the story</button>
+        <button class="skip" data-act="closeStory">Explore the OS</button>
+      </div>
+    </div>`;
+    $('storyFinale').classList.add('on');
+    confetti();
+    document.querySelectorAll('#storyFinale [data-to]').forEach(countUp);
+  }
+
+  function countUp(el){
+    const to=+el.dataset.to, dur=+(el.dataset.dur||1100), dec=el.dataset.dec==='1', pre=el.dataset.pre||'', suf=el.dataset.suf||'';
+    const start=performance.now();
+    (function frame(now){ const p=Math.min(1,(now-start)/dur); const v=to*(1-Math.pow(1-p,3));
+      el.textContent=pre+(dec?v.toFixed(1):Math.round(v).toLocaleString('en-IN'))+suf;
+      if(p<1) requestAnimationFrame(frame);
+    })(performance.now());
+  }
+  function confetti(){
+    const c=$('confetti'); if(!c) return; const cols=['#12a58c','#7fe9d3','#e8a13a','#3d7bd6','#ffffff']; let h='';
+    for(let i=0;i<46;i++){ h+=`<i style="left:${(Math.random()*100).toFixed(1)}vw;background:${cols[i%cols.length]};animation-duration:${(2+Math.random()*1.7).toFixed(2)}s;animation-delay:${(Math.random()*0.5).toFixed(2)}s"></i>`; }
+    c.innerHTML=h; clearTimeout(c._t); c._t=setTimeout(()=>{ c.innerHTML=''; },3900);
   }
   $('mClose').onclick=()=>$('overlay').classList.remove('on');
   $('overlay').onclick=e=>{ if(e.target===$('overlay'))$('overlay').classList.remove('on'); };
   $('drawerBg').onclick=closeDrawer;
   $('menuBtn').onclick=()=>$('side').classList.toggle('on');
   $('globalSearch').addEventListener('input', e=>{ App.search=e.target.value; if(App.view!=='candidates') setView('candidates'); else render(); });
+  { const pb=$('playBtn'); if(pb) pb.onclick=startDemo; }
 
   S.subscribe(()=>render());
   render();

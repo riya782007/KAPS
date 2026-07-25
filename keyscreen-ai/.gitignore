@@ -6,6 +6,7 @@ node_modules/
 
 # temp/test
 _test.js
+_t*.js
 
 # OS / editor
 .DS_Store
