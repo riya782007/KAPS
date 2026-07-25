@@ -220,8 +220,8 @@ button{font-family:inherit}
 /* forms */
 .field{margin-bottom:10px}
 .field label{font-size:11px;font-weight:700;color:var(--slate);display:block;margin-bottom:4px}
-.field input,.field select{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;outline:none;background:#fff}
-.field input:focus,.field select:focus{border-color:var(--teal)}
+.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;outline:none;background:#fff;font-family:inherit;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal)}
 .empty{text-align:center;color:var(--slate);padding:34px 10px;font-size:13px}
 
 @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}

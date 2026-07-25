@@ -28,12 +28,23 @@
     } catch (e) { return { ok:false, error:String(e) }; }
   }
 
+  // Real AI via the serverless proxy /api/ai (no webhook, key stays server-side)
+  async function ai(task, input){
+    try {
+      const r = await fetch('/api/ai', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ task, input }) });
+      const d = await r.json().catch(()=>({}));
+      if (d && d.ok) return { ok:true, text:d.text };
+      return { ok:false, reason: (d && (d.error || d.message)) || 'unavailable' };
+    } catch (e) { return { ok:false, reason:String(e) }; }
+  }
+
   window.Integrations = {
     EVENTS,
     get: () => cfg,
     setUrl: (k,v) => { cfg.urls[k] = (v||'').trim(); save(); },
     setLive: (b) => { cfg.live = !!b; save(); },
     anyConfigured: () => Object.values(cfg.urls).some(Boolean),
-    fire
+    fire,
+    ai
   };
 })();

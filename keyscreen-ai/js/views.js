@@ -114,7 +114,13 @@
   function vSourcing(){
     const st = S.get().candidates.filter(c=>c.status===S.STATUS.NEW || c.status===S.STATUS.SOURCED);
     const src=S.sources();
-    return `<div class="grid-2">
+    return `<div class="card pad" style="margin-bottom:14px">
+      <div class="row-between"><div class="h-sec" style="margin:0">✨ Parse a real résumé with Claude <span class="muted" style="text-transform:none;font-weight:600">· live AI, no webhook</span></div><span class="tag">1 key in Vercel</span></div>
+      <div class="field" style="margin-top:8px"><textarea id="resumeText" rows="4" placeholder="Paste a teacher's résumé or a few lines about them — Claude reads it and builds a structured candidate, live."></textarea></div>
+      <button class="btn primary sm" data-act="aiParse">✨ Parse with Claude</button>
+      <span class="muted" style="font-size:11px;margin-left:8px">Falls back to a demo parse if no AI key is set — so it never breaks in a demo.</span>
+    </div>
+    <div class="grid-2">
       <div>
         <div class="h-sec">Always-on outreach · re-engage the pool</div>
         <div class="card pad">
@@ -301,6 +307,7 @@
       <div class="sect"><h5>Actions</h5>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <button class="btn ghost tiny" data-act="reengage" data-id="${c.id}">📲 Re-engage</button>
+          <button class="btn line tiny" data-act="aiMsg" data-id="${c.id}" data-role="${best?best.r.role:'teaching'}">✨ AI outreach</button>
           ${best?`<button class="btn primary tiny" data-act="screen" data-id="${c.id}" data-req="${best.r.id}" ${c.screening?'disabled':''}>🤖 Screen for ${best.r.role}</button>`:''}
           ${c.trust<2?`<button class="btn line tiny" data-act="verify" data-id="${c.id}" data-tier="${c.trust+1}">${c.trust<1?'✔ Doc verify':'⛓ Blockchain verify'}</button>`:''}
           ${best && c.status!==S.STATUS.PLACED?`<button class="btn line tiny" data-act="place" data-id="${c.id}" data-req="${best.r.id}">🎓 Place at ${S.school(best.r.schoolId).name.split(',')[0]}</button>`:''}
@@ -392,6 +399,36 @@
       case 'beginWalk': beginWalk(); break;
       case 'skipToResults': skipToResults(); break;
       case 'closeStory': hideStory(); break;
+      case 'aiParse': {
+        const txt=val('resumeText'); if(!txt){ toast('Paste a résumé first'); break; }
+        toast('✨ Claude is reading the résumé…');
+        window.Integrations.ai('parse', txt).then(res=>{
+          let obj=null;
+          if(res.ok){ try{ obj=JSON.parse((res.text||'').replace(/```json|```/g,'').trim()); }catch(e){} }
+          if(obj && obj.name){
+            obj.source='AI Parsed'; obj.boards=obj.boards||['CBSE']; obj.skills=obj.skills||[]; obj.qual=obj.qual||(obj.subject+' teacher');
+            S.addCandidate(obj); toast('✅ Parsed live by Claude — added to the graph'); setView('candidates');
+          } else {
+            const nm=(txt.split(/\n|,/)[0]||'New Candidate').trim().slice(0,40);
+            S.addCandidate({name:nm, subject:'Physics', exp:2, loc:'Gurgaon', cur:25, exp_ctc:32, notice:'30 days', qual:'Teacher', boards:['CBSE'], skills:['b.ed'], source:'Manual'});
+            toast(res.reason==='no-key' ? 'Added (demo parse) — add ANTHROPIC_API_KEY in Vercel for live AI' : 'Added (demo parse fallback)');
+            setView('candidates');
+          }
+        });
+        break;
+      }
+      case 'aiMsg': {
+        const c=S.cand(id); if(!c) break;
+        $('mName').textContent='AI outreach — '+c.name; $('mRole').textContent='Personalised live by Claude';
+        $('mBody').innerHTML='<div class="msg ai"><div class="w">🤖 Maya</div><div class="bub">✨ Writing a message…</div></div>';
+        $('mVerdict').textContent=''; $('overlay').classList.add('on');
+        window.Integrations.ai('outreach', {name:c.name, role:el.dataset.role||'teaching'}).then(res=>{
+          const msg = res.ok ? res.text : `Hi ${c.name.split(' ')[0]}! 👋 This is Edukey360. We have a ${el.dataset.role||'teaching'} opening that fits your profile (${c.qual}). Are you open to it? Reply YES and we'll schedule your interview. 🎓`;
+          $('mBody').innerHTML=`<div class="wa" style="white-space:pre-wrap;background:#f7faf9;border:1px dashed var(--teal);border-radius:12px;padding:12px;font-size:13px">${msg}</div>`;
+          $('mVerdict').innerHTML = res.ok ? '<span style="color:var(--teal-d)">✍️ Written live by Claude</span>' : (res.reason==='no-key'?'Template shown — add ANTHROPIC_API_KEY in Vercel for live AI':'Template shown — AI unavailable');
+        });
+        break;
+      }
       case 'saveIntegrations': {
         if(window.Integrations){ ['outreach','screen','verify','place','candidate'].forEach(k=>window.Integrations.setUrl(k, val('wh_'+k))); const lt=$('liveToggle'); window.Integrations.setLive(lt && lt.checked); }
         toast('✅ Integrations saved'); render(); break;
