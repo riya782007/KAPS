@@ -283,17 +283,30 @@
     const cfg = window.Integrations ? window.Integrations.get() : {live:false,urls:{}};
     const fields = [
       ['outreach','📲 Outreach — WhatsApp / voice re-engage'],
-      ['screen','🤖 AI Screening — Claude + voice/WhatsApp call'],
+      ['screen','🤖 AI Screening — OpenAI + voice/WhatsApp call'],
       ['verify','🔒 Verification — KYC / DigiLocker / blockchain'],
       ['place','🎓 Placement — invoice (Razorpay) + onboarding'],
       ['candidate','📄 New candidate — resume parse + enrich']
     ];
-    return `<div class="card pad" style="margin-bottom:14px">
-      <b>⚙️ Make it real — n8n + AI</b>
-      <p class="muted" style="font-size:12.5px;margin-top:5px">Paste your <b>n8n webhook URLs</b>. With <b>Live mode ON</b>, each action in this app fires the matching n8n workflow — which runs the real automation (Claude for matching/screening, WhatsApp, voice, KYC, Razorpay). Your API keys live safely in <b>n8n credentials</b>, never in this frontend. Keep Live <b>OFF</b> for the Monday demo — everything still works on seed data.</p>
-      <div style="margin-top:8px"><span class="st ${cfg.live?'st-Placed':'st-New'}">${cfg.live?'● LIVE MODE ON':'○ Demo mode (offline)'}</span></div>
+    const steps = [
+      ['1','Structured profile ready','The candidate already has a parsed record — subject, experience, board, current &amp; expected CTC, notice, location.'],
+      ['2','AI runs the conversation','“Maya” asks the same 7 questions every time (interest, CTC, notice, location, board, availability) over voice or WhatsApp.'],
+      ['3','Speech → structured fields','Answers are converted to fields and written straight to the candidate record — no Excel, no re-typing.'],
+      ['4','Auto-tag &amp; route','The outcome is auto-tagged — Interview-Ready, Interested, Call-Back, Not-Interested — and the pipeline + KPIs update instantly.']
+    ];
+    return `<div class="card pad ai-glow" style="margin-bottom:14px;background:linear-gradient(120deg,rgba(18,165,140,.10),rgba(61,123,214,.06))">
+      <div class="row-between"><div><b>🧠 AI Engine — OpenAI</b><div class="muted" style="font-size:12.5px;margin-top:4px">Screening, matching &amp; résumé parsing run through a secure serverless endpoint (<code style="background:#eef3f1;padding:1px 5px;border-radius:5px">/api/ai</code>). Your key lives in Vercel, never in this app.</div></div>
+        <span class="st st-Placed" style="flex-shrink:0">● Connected</span></div>
+    </div>
+    <div class="card pad" style="margin-bottom:14px">
+      <div class="h-sec" style="margin-bottom:10px">How AI screening works</div>
+      <div style="display:grid;gap:10px">
+        ${steps.map(([n,t,d])=>`<div style="display:flex;gap:12px;align-items:flex-start"><span style="width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px;flex-shrink:0">${n}</span><div><div style="font-weight:700;font-size:13px">${t}</div><div class="muted" style="font-size:12px;margin-top:2px">${d}</div></div></div>`).join('')}
+      </div>
+      <div class="callout" style="margin-top:12px;background:#fff8ec;border:1px solid #f0dcae;border-radius:12px;padding:10px 12px;font-size:12px;color:#7a5a1c">In this demo, screening plays a deterministic script so it never fails. In production the <b>same flow</b> calls OpenAI live and, optionally, a voice/WhatsApp provider via the webhooks below.</div>
     </div>
     <div class="card pad">
+      <div style="margin-bottom:10px"><b>⚙️ Optional automation webhooks (n8n)</b><div class="muted" style="font-size:12px;margin-top:4px">For the deeper actions — WhatsApp/voice outreach, KYC verification, invoicing — paste n8n webhook URLs and flip <b>Live mode</b> on. Keys stay in n8n. Leave OFF for the demo. <span class="st ${cfg.live?'st-Placed':'st-New'}">${cfg.live?'● LIVE MODE ON':'○ Demo mode'}</span></div></div>
       <div class="row-between" style="margin-bottom:12px">
         <div class="h-sec" style="margin:0">Webhook endpoints</div>
         <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;font-weight:700;cursor:pointer"><input type="checkbox" id="liveToggle" ${cfg.live?'checked':''}> Live mode</label>
