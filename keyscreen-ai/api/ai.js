@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
   try {
     let text = '';
     if (openaiKey) {
-      const model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+      const model = process.env.OPENAI_MODEL || 'gpt-4o';  // override with OPENAI_MODEL (e.g. a GPT-5.6 model) in Vercel
       const r = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'Authorization': 'Bearer ' + openaiKey, 'content-type': 'application/json' },

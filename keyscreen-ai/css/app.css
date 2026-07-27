@@ -217,6 +217,59 @@ button{font-family:inherit}
 .confetti i{position:absolute;top:-14px;width:9px;height:15px;border-radius:2px;opacity:.95;animation:fall linear forwards}
 @keyframes fall{to{transform:translateY(106vh) rotate(720deg);opacity:.15}}
 
+/* ============================================================
+   PREMIUM POLISH — typography, motion, micro-interactions
+   ============================================================ */
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-feature-settings:"cv11","ss01";letter-spacing:-.1px}
+h1,h2,.kpi .n,.brand h1{letter-spacing:-.4px}
+::selection{background:rgba(18,165,140,.22)}
+
+/* soft custom scrollbars */
+*{scrollbar-width:thin;scrollbar-color:#cfe0db transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#cfe0db;border-radius:8px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:#b7d3cb;background-clip:content-box}
+
+/* smooth, tactile motion */
+.card,.kpi,.reqc,.crow,.mini,.tile{transition:transform .18s cubic-bezier(.34,1.2,.5,1), box-shadow .18s ease, border-color .18s ease}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(15,38,32,.13)}
+.card:hover{box-shadow:0 12px 30px rgba(15,38,32,.10)}
+.crow:hover{transform:translateY(-2px)}
+.reqc:hover{transform:translateY(-2px)}
+.btn{transition:transform .12s cubic-bezier(.34,1.4,.5,1), background .14s ease, box-shadow .16s ease}
+.btn:active{transform:scale(.95)}
+.btn.primary{box-shadow:0 6px 16px rgba(18,165,140,.26)}
+.btn.primary:hover{box-shadow:0 9px 24px rgba(18,165,140,.4)}
+
+/* KPI accent sheen on hover */
+.kpi{position:relative;overflow:hidden}
+.kpi::after{content:"";position:absolute;left:0;top:0;height:3px;width:100%;background:linear-gradient(90deg,var(--teal),#7fe9d3);transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+.kpi:hover::after{transform:scaleX(1)}
+.kpi .n{transition:color .2s}
+
+/* animated sidebar active state */
+.nav a{transition:background .15s ease, color .15s ease, transform .15s ease}
+.nav a:active{transform:translateX(1px)}
+.nav a.active{animation:navactive .34s cubic-bezier(.34,1.3,.5,1)}
+@keyframes navactive{from{transform:translateX(-6px);opacity:.5}to{transform:none;opacity:1}}
+
+/* view enters smoothly on navigation */
+#view.enter{animation:viewin .36s cubic-bezier(.22,.9,.3,1)}
+@keyframes viewin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* guided-demo progress bar */
+.coach .prog{height:3px;background:rgba(255,255,255,.16);border-radius:3px;margin-top:9px;overflow:hidden}
+.coach .prog i{display:block;height:100%;background:#7fe9d3;border-radius:3px;transition:width .5s cubic-bezier(.22,.9,.3,1)}
+
+/* subtle topbar + story depth */
+.top{box-shadow:0 1px 0 rgba(15,38,32,.05)}
+.story .tile{transition:transform .2s ease}
+.story .tile:hover{transform:translateY(-3px)}
+.drawer .sect{transition:transform .15s ease}
+
+/* status/badge fades */
+.st,.trust,.tag{transition:background .2s ease}
+
 /* forms */
 .field{margin-bottom:10px}
 .field label{font-size:11px;font-weight:700;color:var(--slate);display:block;margin-bottom:4px}

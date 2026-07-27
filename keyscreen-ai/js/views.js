@@ -347,11 +347,34 @@
     candidates:['Knowledge Graph','Every candidate node, shared across modules'],
     settings:['Integrations','Connect n8n webhooks + AI to make it real']};
   function setView(v){ App.view=v; document.querySelectorAll('.nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===v)); $('side').classList.remove('on'); render(); }
+  function animateNum(el, from, to, pre, suf, dec){
+    const start=performance.now(), dur=650;
+    (function f(now){ const p=Math.min(1,(now-start)/dur); const v=from+(to-from)*(1-Math.pow(1-p,3));
+      el.textContent=pre+(dec?v.toFixed(1):Math.round(v).toLocaleString('en-IN'))+suf;
+      if(p<1) requestAnimationFrame(f);
+    })(performance.now());
+  }
+  const _kpiPrev={};
+  function animateKpis(){
+    document.querySelectorAll('#view .kpi').forEach(box=>{
+      const nEl=box.querySelector('.n'), lEl=box.querySelector('.l'); if(!nEl||!lEl) return;
+      const label=lEl.textContent.trim();
+      const m=nEl.textContent.match(/^([^\d-]*)([\d.,]+)(.*)$/); if(!m) return;
+      const pre=m[1], numStr=m[2], suf=m[3], dec=numStr.indexOf('.')>=0;
+      const to=parseFloat(numStr.replace(/,/g,'')); if(isNaN(to)) return;
+      const from=(label in _kpiPrev)?_kpiPrev[label]:0; _kpiPrev[label]=to;
+      if(from!==to) animateNum(nEl, from, to, pre, suf, dec);
+    });
+  }
   function render(){
     const [t,c]=TITLES[App.view]||TITLES.dashboard; $('viewTitle').textContent=t; $('viewCrumb').textContent=c;
     $('pip-open').textContent=S.kpis().activeReqs;
     const map={dashboard:vDashboard,requirements:vRequirements,sourcing:vSourcing,match:vMatch,screen:vScreen,verify:vVerify,portal:vPortal,candidates:vCandidates,settings:vSettings};
-    $('view').innerHTML=(map[App.view]||vDashboard)();
+    const host=$('view');
+    const changed = render._rv !== App.view; render._rv = App.view;
+    host.innerHTML=(map[App.view]||vDashboard)();
+    if(changed){ host.classList.remove('enter'); void host.offsetWidth; host.classList.add('enter'); }
+    if(App.view==='dashboard') requestAnimationFrame(animateKpis);
     if(App.drawerId && $('drawer').classList.contains('on')) renderDrawer();
   }
 
@@ -462,7 +485,8 @@
   const STEPS = DEMO.filter(s=>s.say).length;
   function setCoach(){
     const shown = DEMO.slice(0,demoIdx+1).filter(s=>s.say).length;
-    $('coach').innerHTML = `<div class="txt"><div class="step">GUIDED DEMO · STEP ${Math.min(shown,STEPS)} / ${STEPS}</div><div class="say">${lastSay}</div></div>
+    const pct = Math.round(Math.min(shown,STEPS)/STEPS*100);
+    $('coach').innerHTML = `<div class="txt"><div class="step">GUIDED DEMO · STEP ${Math.min(shown,STEPS)} / ${STEPS}</div><div class="say">${lastSay}</div><div class="prog"><i style="width:${pct}%"></i></div></div>
       <div class="btns"><button class="stop" data-act="stopDemo">Stop</button></div>`;
   }
   function hideCoach(){ $('coach').classList.remove('on'); }
