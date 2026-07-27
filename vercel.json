@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/keyscreen-ai/index.html" },
+    { "source": "/(.*)", "destination": "/keyscreen-ai/$1" }
+  ]
+}

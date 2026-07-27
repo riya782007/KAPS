@@ -5,7 +5,12 @@
    ============================================================ */
 (function () {
   const S = window.Store;
-  const App = { view: 'dashboard', selReq: S.get().requirements[0].id, search: '', drawerId: null, portalQ: '' };
+  const App = { view: 'dashboard', selReq: S.get().requirements[0].id, search: '', drawerId: null, portalQ: '', parsePreview: null, gfilter: 'All' };
+  const SAMPLE_RESUMES = [
+    "Rohit Sharma — M.Sc Physics, B.Ed. 6 years teaching PGT Physics at a CBSE senior secondary school in Gurgaon. Current salary 46,000/month, expecting around 58,000. Notice period 30 days. Strong in NEP-2020 pedagogy, lab practicals and board exam prep. CTET qualified.",
+    "Priya Nair — Primary Teacher (PRT). B.A + D.El.Ed, CTET cleared. 2 years at a CBSE school in Delhi teaching classes 1-5. Current 21,000/month, expected 27,000. Can join immediately. Warm, activity-based teaching style.",
+    "Imran Khan — M.Sc Mathematics with B.Ed, 4 years experience teaching TGT Maths (CBSE), based in Delhi. Present CTC 34,000 pm, expected 44,000 pm, 30 days notice. Comfortable with grades 6-10 and olympiad coaching."
+  ];
   const $ = id => document.getElementById(id);
   const PALETTE = ['#3d7bd6','#12a58c','#e8a13a','#7a5cd6','#e05b5b','#0e8574','#c0603a','#3f7d2f','#2f6d7d','#b2582f','#4a6fa5','#8a5a2b'];
 
@@ -41,8 +46,30 @@
   }
 
   /* ================= VIEWS ================= */
+  function nextActions(){
+    const cs=S.get().candidates, reqs=S.get().requirements, A=[];
+    const urgent=reqs.filter(r=>r.status==='open'&&r.urgency==='High');
+    if(urgent.length) A.push({i:'🔥',t:`${urgent.length} High-urgency requirement${urgent.length>1?'s':''} still open — prioritise sourcing`,v:'requirements'});
+    const ready=cs.filter(c=>c.status===S.STATUS.READY);
+    if(ready.length) A.push({i:'✅',t:`${ready.length} candidate${ready.length>1?'s':''} interview-ready — schedule interviews`,v:'match'});
+    const cb=cs.filter(c=>c.status===S.STATUS.CALLBACK);
+    if(cb.length) A.push({i:'💬',t:`${cb.length} flagged for CTC negotiation — call back`,v:'candidates'});
+    const nw=cs.filter(c=>c.status===S.STATUS.NEW);
+    if(nw.length) A.push({i:'📲',t:`${nw.length} teacher${nw.length>1?'s':''} not yet contacted — re-engage the pool`,v:'sourcing'});
+    const uv=cs.filter(c=>c.trust===0 && c.status!==S.STATUS.PLACED);
+    if(uv.length) A.push({i:'🔒',t:`${uv.length} unverified — verify once, reuse everywhere`,v:'verify'});
+    const fr=S.flightRisks().filter(c=>c.retention.risk>50);
+    if(fr.length) A.push({i:'⚠️',t:`${fr.length} placed teacher${fr.length>1?'s':''} at high flight-risk — proactive check-in`,v:'dashboard'});
+    if(!A.length) A.push({i:'🎉',t:'All clear — pipeline is healthy. Source new requirements to grow.',v:'requirements'});
+    return A.slice(0,5);
+  }
   function vDashboard(){
     const k = S.kpis(), pipe = S.pipeline(), risks = S.flightRisks(), src = S.sources();
+    const acts = nextActions();
+    const actionsCard = `<div class="card pad" style="margin-bottom:16px;border-left:3px solid var(--teal)">
+      <div class="h-sec">⚡ Next best actions <span class="muted" style="text-transform:none;font-weight:600">· the OS tells you where to look</span></div>
+      ${acts.map(a=>`<div class="crow" data-act="goView" data-view="${a.v}" style="cursor:pointer"><div style="font-size:18px">${a.i}</div><div style="flex:1;font-weight:600;font-size:13.5px">${a.t}</div><div class="muted" style="font-size:16px">›</div></div>`).join('')}
+    </div>`;
     const funnelStages = ['Sourced','Interested','Interview Ready','Placed'];
     const maxF = Math.max(1, ...funnelStages.map(s=>(pipe.map[s]||[]).length), S.get().candidates.length);
     const feed = S.get().activity.slice(0,14);
@@ -61,6 +88,7 @@
       ${kpi('💳', money(k.revenue), 'Auto-billed')}
     </div>
     <div class="spacer"></div>
+    ${actionsCard}
     <div class="grid-2">
       <div class="card pad">
         <div class="h-sec">Hiring funnel</div>
@@ -89,14 +117,16 @@
     <div id="reqForm" style="display:none" class="card pad pop" >${reqForm()}</div>
     <div class="spacer"></div>
     <div class="grid-2">${rs.map(r=>{
-      const sch=S.school(r.schoolId); const matched=S.matchFor(r.id).length;
+      const sch=S.school(r.schoolId); const list=S.matchFor(r.id);
+      const ready=list.filter(x=>x.c.status===S.STATUS.READY).length;
+      const sla={High:3,Medium:7,Low:14}[r.urgency]||7;
       return `<div class="reqc" data-act="openMatch" data-req="${r.id}">
         <div class="row-between"><div class="role">${r.role}</div><span class="urg ${r.urgency}">${r.urgency}</span></div>
         <div class="rm">${sch.name} · ${r.board} · ${r.grade} · ${r.loc} · ${money(r.band[0]*1000)}–${money(r.band[1]*1000)}</div>
-        <div class="tags" style="margin-top:8px">${r.must.map(m=>`<span class="tag">${m}</span>`).join('')}</div>
+        <div class="tags" style="margin-top:8px">${r.must.map(m=>`<span class="tag">${m}</span>`).join('')}<span class="tag">⏱ SLA ${sla}d</span></div>
         <div class="row-between" style="margin-top:10px">
           <span class="st ${r.status==='filled'?'st-Placed':'st-Sourced'}">${r.status==='filled'?'Filled':'Open'}</span>
-          <span class="muted" style="font-size:12px">🎯 ${matched} matched → <b>Open in Match</b></span>
+          <span class="muted" style="font-size:12px">🎯 ${list.length} matched · ✅ ${ready} ready → <b>Open in Match</b></span>
         </div>
       </div>`;}).join('')}</div>`;
   }
@@ -111,14 +141,30 @@
     </div><button class="btn primary sm" data-act="addreq">Create requirement</button>`;
   }
 
+  function pfield(l,v){ return `<div><div class="muted" style="font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.4px">${l}</div><div style="font-weight:700;font-size:13px;margin-top:2px">${v||'—'}</div></div>`; }
   function vSourcing(){
     const st = S.get().candidates.filter(c=>c.status===S.STATUS.NEW || c.status===S.STATUS.SOURCED);
     const src=S.sources();
-    return `<div class="card pad" style="margin-bottom:14px">
-      <div class="row-between"><div class="h-sec" style="margin:0">✨ Parse a real résumé with Claude <span class="muted" style="text-transform:none;font-weight:600">· live AI, no webhook</span></div><span class="tag">1 key in Vercel</span></div>
-      <div class="field" style="margin-top:8px"><textarea id="resumeText" rows="4" placeholder="Paste a teacher's résumé or a few lines about them — Claude reads it and builds a structured candidate, live."></textarea></div>
-      <button class="btn primary sm" data-act="aiParse">✨ Parse with Claude</button>
-      <span class="muted" style="font-size:11px;margin-left:8px">Falls back to a demo parse if no AI key is set — so it never breaks in a demo.</span>
+    const pv=App.parsePreview;
+    const previewCard = pv ? `<div class="card pad pop" style="margin-bottom:14px;border:2px solid var(--teal)">
+      <div class="row-between"><div class="h-sec" style="margin:0">${pv.live?'✨ Extracted live by AI':'📄 Parsed (demo fallback)'}</div>
+        <span class="st ${pv.live?'st-Placed':'st-CallBack'}">${pv.live?'● GPT read this résumé':'add OPENAI_API_KEY for live AI'}</span></div>
+      <div class="grid-3" style="margin-top:10px;gap:12px">
+        ${pfield('Name',pv.obj.name)}${pfield('Subject',pv.obj.subject)}${pfield('Experience',(pv.obj.exp||0)+' yrs')}
+        ${pfield('Qualification',pv.obj.qual)}${pfield('Location',pv.obj.loc)}${pfield('Boards',(pv.obj.boards||[]).join(', '))}
+        ${pfield('Current CTC','₹'+(pv.obj.cur||0)+'k')}${pfield('Expected CTC','₹'+(pv.obj.exp_ctc||0)+'k')}${pfield('Notice',pv.obj.notice)}
+      </div>
+      <div style="margin-top:10px;display:flex;gap:5px;flex-wrap:wrap">${(pv.obj.skills||[]).map(s=>`<span class="tag">${s}</span>`).join('')}</div>
+      <div style="display:flex;gap:8px;margin-top:14px"><button class="btn primary sm" data-act="confirmParse">✅ Add to Knowledge Graph</button><button class="btn line sm" data-act="discardParse">Discard</button></div>
+    </div>` : '';
+    return previewCard + `<div class="card pad" style="margin-bottom:14px">
+      <div class="row-between"><div class="h-sec" style="margin:0">✨ Parse a real résumé with AI <span class="muted" style="text-transform:none;font-weight:600">· live GPT, no webhook</span></div><span class="tag">1 key in Vercel</span></div>
+      <div class="field" style="margin-top:8px"><textarea id="resumeText" rows="4" placeholder="Paste a teacher's résumé or a few lines about them — AI reads it and builds a structured candidate, live.">${pv?'':''}</textarea></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="btn primary sm" data-act="aiParse">✨ Parse with AI</button>
+        <span class="muted" style="font-size:11px">or try a sample →</span>
+        ${SAMPLE_RESUMES.map((s,i)=>`<span class="tag" style="cursor:pointer" data-act="loadSample" data-i="${i}">📄 ${s.split('—')[0].trim()}</span>`).join('')}
+      </div>
     </div>
     <div class="grid-2">
       <div>
@@ -198,7 +244,7 @@
     const cs=S.get().candidates; const k=S.kpis();
     const tiers=[{t:0,name:'Self-declared — needs verification'},{t:1,name:'Document-verified'},{t:2,name:'Blockchain-verified (DigiLocker/AICTE)'}];
     return `<div class="grid-4">${kpi('🔒',k.verifiedPct+'%','Pool verified')}${kpi('⛓',cs.filter(c=>c.trust===2).length,'Blockchain-verified')}${kpi('✔',cs.filter(c=>c.trust===1).length,'Document-verified')}${kpi('◔',cs.filter(c=>c.trust===0).length,'Awaiting verification')}</div><div class="spacer"></div>
-    <div class="card pad" style="margin-bottom:12px"><b>Trust Layer</b> — verify once, reuse across Match, Screening & the School Portal. Tiered badges solve the Model-3 verification question.</div>
+    <div class="card pad" style="margin-bottom:12px"><div class="row-between"><div><b>Trust Layer</b> — verify once, reuse across Match, Screening &amp; the School Portal. Tiered badges solve the Model-3 verification question.</div><button class="btn ghost sm" data-act="verifyAllDoc" style="flex-shrink:0">✔ Verify all pending</button></div></div>
     ${tiers.map(g=>{const grp=cs.filter(c=>c.trust===g.t); if(!grp.length)return ''; return `<div class="h-sec">${trustBadge(g.t)} &nbsp; ${g.name} <span class="muted" style="text-transform:none;font-weight:600">(${grp.length})</span></div>
       ${grp.map(c=>crow(c, `<div style="display:flex;gap:5px">${c.trust<1?`<button class="btn line tiny" data-act="verify" data-id="${c.id}" data-tier="1">✔ Doc verify</button>`:''}${c.trust<2?`<button class="btn ghost tiny" data-act="verify" data-id="${c.id}" data-tier="2">⛓ Blockchain</button>`:'<span class="tag">fully verified</span>'}</div>`)).join('')}<div class="spacer"></div>`;}).join('')}`;
   }
@@ -222,11 +268,15 @@
   }
 
   function vCandidates(){
-    let cs=S.get().candidates;
+    const all=S.get().candidates;
+    let cs=all;
     if(App.search){ const q=App.search.toLowerCase(); cs=cs.filter(c=>(c.name+c.subject+c.loc+c.qual).toLowerCase().includes(q)); }
-    return `<div class="card pad" style="margin-bottom:12px"><b>🧠 Candidate Knowledge Graph</b> — the single shared record every module reads & writes. Click any teacher for their 360° node.</div>
-    <div class="h-sec">${cs.length} candidate nodes</div>
-    ${cs.map(c=>crow(c, `<span class="muted" style="font-size:11px">${c.timeline.length} events</span>`)).join('') || `<div class="empty">No candidates match “${App.search}”.</div>`}`;
+    if(App.gfilter && App.gfilter!=='All') cs=cs.filter(c=>c.status===App.gfilter);
+    const chips=['All',S.STATUS.NEW,S.STATUS.SOURCED,S.STATUS.INTERESTED,S.STATUS.READY,S.STATUS.PLACED];
+    return `<div class="card pad" style="margin-bottom:12px"><b>🧠 Candidate Knowledge Graph</b> — the single shared record every module reads &amp; writes. Click any teacher for their 360° node.</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">${chips.map(s=>{const n=s==='All'?all.length:all.filter(c=>c.status===s).length;return `<span class="tag" style="cursor:pointer;${App.gfilter===s?'background:var(--teal);color:#fff;border-color:var(--teal)':''}" data-act="gfilter" data-status="${s}">${s} · ${n}</span>`;}).join('')}</div>
+    <div class="h-sec">${cs.length} candidate node${cs.length!==1?'s':''}${App.gfilter!=='All'?' · '+App.gfilter:''}</div>
+    ${cs.map(c=>crow(c, `<span class="muted" style="font-size:11px">${c.timeline.length} events</span>`)).join('') || `<div class="empty">No candidates match this filter.</div>`}`;
   }
 
   function vSettings(){
@@ -422,24 +472,35 @@
       case 'beginWalk': beginWalk(); break;
       case 'skipToResults': skipToResults(); break;
       case 'closeStory': hideStory(); break;
+      case 'loadSample': { const ta=$('resumeText'); if(ta) ta.value=SAMPLE_RESUMES[+el.dataset.i]||''; break; }
       case 'aiParse': {
-        const txt=val('resumeText'); if(!txt){ toast('Paste a résumé first'); break; }
-        toast('✨ Claude is reading the résumé…');
+        const txt=val('resumeText'); if(!txt){ toast('Paste a résumé (or pick a sample) first'); break; }
+        el.disabled=true; el.textContent='✨ AI is reading…'; toast('✨ AI is reading the résumé…');
         window.Integrations.ai('parse', txt).then(res=>{
           let obj=null;
           if(res.ok){ try{ obj=JSON.parse((res.text||'').replace(/```json|```/g,'').trim()); }catch(e){} }
           if(obj && obj.name){
-            obj.source='AI Parsed'; obj.boards=obj.boards||['CBSE']; obj.skills=obj.skills||[]; obj.qual=obj.qual||(obj.subject+' teacher');
-            S.addCandidate(obj); toast('✅ Parsed live by Claude — added to the graph'); setView('candidates');
+            obj.source='AI Parsed'; obj.boards=obj.boards||['CBSE']; obj.skills=obj.skills||[]; obj.qual=obj.qual||((obj.subject||'')+' teacher');
+            App.parsePreview={obj, live:true};
           } else {
-            const nm=(txt.split(/\n|,/)[0]||'New Candidate').trim().slice(0,40);
-            S.addCandidate({name:nm, subject:'Physics', exp:2, loc:'Gurgaon', cur:25, exp_ctc:32, notice:'30 days', qual:'Teacher', boards:['CBSE'], skills:['b.ed'], source:'Manual'});
-            toast(res.reason==='no-key' ? 'Added (demo parse) — add ANTHROPIC_API_KEY in Vercel for live AI' : 'Added (demo parse fallback)');
-            setView('candidates');
+            const nm=(txt.split(/[\n,—-]/)[0]||'New Candidate').trim().slice(0,40);
+            App.parsePreview={obj:{name:nm, subject:'Physics', exp:2, loc:'Gurgaon', cur:25, exp_ctc:32, notice:'30 days', qual:'Teacher', boards:['CBSE'], skills:['b.ed'], source:'Manual'}, live:false, reason:res.reason};
           }
+          render();
         });
         break;
       }
+      case 'confirmParse': {
+        if(App.parsePreview){ const nm=App.parsePreview.obj.name; S.addCandidate(App.parsePreview.obj); App.parsePreview=null; toast('✅ '+nm+' added to the Knowledge Graph'); setView('candidates'); }
+        break;
+      }
+      case 'discardParse': { App.parsePreview=null; render(); break; }
+      case 'goView': setView(el.dataset.view); break;
+      case 'verifyAllDoc': {
+        let n=0; S.get().candidates.forEach(c=>{ if(c.trust===0 && c.status!==S.STATUS.PLACED){ S.verify(c.id,1); n++; } });
+        toast(n?`✔ Document-verified ${n} candidates`:'None pending'); break;
+      }
+      case 'gfilter': { App.gfilter=el.dataset.status||'All'; render(); break; }
       case 'aiMsg': {
         const c=S.cand(id); if(!c) break;
         $('mName').textContent='AI outreach — '+c.name; $('mRole').textContent='Personalised live by Claude';
