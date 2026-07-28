@@ -128,8 +128,16 @@ function AiAssistant() {
     if (s.includes("summar") || s.includes("ananya")) return "Ananya Sharma — M.Sc Physics + B.Ed, 5 yrs CBSE. 96% match for PGT Physics. Strengths: board prep, labs. Low flight-risk. Interview-ready.";
     return "On it — I've queued that across the pipeline and updated the trackers automatically. No manual entry needed.";
   };
-  const send = (q: string) => {
-    setMsgs((m) => [...m, { role: "me", text: q }, { role: "ai", text: answer(q) }]);
+  const send = async (q: string) => {
+    setMsgs((m) => [...m, { role: "me", text: q }, { role: "ai", text: "…" }]);
+    try {
+      const r = await fetch("/api/agent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agent: "assistant", payload: { q } }) });
+      const d = await r.json();
+      const text = d.ok && d.result ? d.result : answer(q);
+      setMsgs((m) => { const c = [...m]; c[c.length - 1] = { role: "ai", text }; return c; });
+    } catch {
+      setMsgs((m) => { const c = [...m]; c[c.length - 1] = { role: "ai", text: answer(q) }; return c; });
+    }
   };
   return (
     <>
