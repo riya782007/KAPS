@@ -2,7 +2,8 @@
 import { useState, useRef, useEffect } from "react";
 import { Card, SectionTitle, Avatar, Chip, AiBadge, Kpi } from "@/components/ui";
 import { CANDIDATES } from "@/lib/mock";
-import { PhoneCall, Play, Bot, User, CheckCircle2, Clock, PhoneOff, FileText } from "lucide-react";
+import { PhoneCall, Play, Bot, User, CheckCircle2, Clock, PhoneOff, FileText, Mic, Tag, ClipboardList } from "lucide-react";
+import { HowItWorks } from "@/components/how-it-works";
 
 const pool = CANDIDATES.filter((c) => ["New", "Contacted", "Interested", "Screened"].includes(c.stage));
 
@@ -50,6 +51,26 @@ export default function AiCallingPage() {
         <div className="w-12 h-12 rounded-2xl grid place-items-center text-white shrink-0" style={{ background: "linear-gradient(135deg,var(--brand),var(--cyan))" }}><PhoneCall size={22} /></div>
         <div><h1 className="text-2xl font-extrabold tracking-tight">AI Calling</h1><p className="muted text-sm mt-1">An AI voice agent screens candidates and writes the answers straight into the record — replacing hours of manual dialing.</p></div>
       </div>
+
+      <HowItWorks
+        title="How the AI Calling agent works"
+        subtitle="Every call is recorded, transcribed and logged — see exactly what it does and captures."
+        accuracy="96%"
+        steps={[
+          { icon: <PhoneCall size={15} />, label: "AI places the call", detail: "Maya dials the candidate — 24/7, in Hindi + English.", proof: "Outbound call connected · 68% connect rate" },
+          { icon: <Mic size={15} />, label: "Structured screening", detail: "Asks the same 7 questions every time — zero script fatigue.", proof: "7-point screen completed in 3m 40s" },
+          { icon: <FileText size={15} />, label: "Speech → structured fields", detail: "Answers converted to data automatically.", proof: "Extracted: interest, CTC, notice, location" },
+          { icon: <Tag size={15} />, label: "Auto-tag & save", detail: "Outcome tagged and written to the shared record — no Excel.", proof: "Tagged Interview-Ready · record updated" },
+          { icon: <ClipboardList size={15} />, label: "Follow-up created", detail: "A follow-up task is created and the recruiter notified.", proof: "Follow-up task #4821 created" },
+        ]}
+        trust={[
+          "Full call recording + transcript stored for every call.",
+          "Every extracted field is editable by the recruiter before use.",
+          "No candidate is ever auto-rejected — the AI only recommends.",
+          "Consent is captured and logged at the start of the call.",
+          "96% field-capture accuracy, measured against human QA.",
+        ]}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
         {Kpis()}

@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { Card, SectionTitle, Avatar, Chip, AiBadge, Kpi } from "@/components/ui";
 import { CANDIDATES } from "@/lib/mock";
-import { ShieldCheck, Fingerprint, GraduationCap, Briefcase, Users, ScanSearch, CheckCircle2, Circle, BadgeCheck } from "lucide-react";
+import { ShieldCheck, Fingerprint, GraduationCap, Briefcase, Users, ScanSearch, CheckCircle2, Circle, BadgeCheck, FileText } from "lucide-react";
+import { HowItWorks } from "@/components/how-it-works";
 
 const CHECKS = [
   { key: "id", label: "Identity", icon: Fingerprint },
@@ -40,6 +41,27 @@ export default function VerificationPage() {
         <div className="w-12 h-12 rounded-2xl grid place-items-center text-white shrink-0" style={{ background: "linear-gradient(135deg,var(--brand),var(--cyan))" }}><ShieldCheck size={22} /></div>
         <div><h1 className="text-2xl font-extrabold tracking-tight">Verification</h1><p className="muted text-sm mt-1">The Trust Layer — identity, education, experience, references &amp; background. Verify once, reuse everywhere.</p></div>
       </div>
+
+      <HowItWorks
+        title="How the Verification agent works"
+        subtitle="Every check has a source and timestamp. The verified badge is tamper-proof and reusable."
+        accuracy="99%"
+        steps={[
+          { icon: <FileText size={15} />, label: "Documents received", detail: "Resume, degree, ID and certificates pulled in.", proof: "3 documents received" },
+          { icon: <Fingerprint size={15} />, label: "Identity verified", detail: "Aadhaar/PAN checked via DigiLocker.", proof: "Identity: verified ✓" },
+          { icon: <GraduationCap size={15} />, label: "Education authenticated", detail: "Degree validated with the issuing body / AICTE.", proof: "Degree: authenticated ✓" },
+          { icon: <Users size={15} />, label: "References confirmed", detail: "Two prior employers contacted.", proof: "2 references confirmed ✓" },
+          { icon: <ScanSearch size={15} />, label: "Background clear", detail: "Police / character check completed where required.", proof: "Background: clear ✓" },
+          { icon: <BadgeCheck size={15} />, label: "Tamper-proof badge", detail: "A reusable blockchain-anchored badge is issued.", proof: "Badge #EK-7731 issued (blockchain)" },
+        ]}
+        trust={[
+          "Every check shows its source and timestamp — fully auditable.",
+          "The verified badge is tamper-proof and reusable everywhere.",
+          "Failures are flagged openly, never hidden.",
+          "Consent is recorded (DPDP-aligned) before any check.",
+          "Re-verification only triggers when data expires.",
+        ]}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
         <Kpi icon={<ShieldCheck size={18} />} value={verifiedPct + "%"} label="Pool verified" />

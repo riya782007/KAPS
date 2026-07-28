@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Card, SectionTitle, AiBadge, Chip, Kpi } from "@/components/ui";
 import { FileText, Upload, ScanText, CheckCircle2, XCircle, FileCheck } from "lucide-react";
+import { HowItWorks } from "@/components/how-it-works";
 
 const DOCS = ["Resume", "Degree certificate", "Government ID", "Experience letters", "Teaching certification"];
 
@@ -34,6 +35,26 @@ export default function DocumentsPage() {
         <div className="w-12 h-12 rounded-2xl grid place-items-center text-white shrink-0" style={{ background: "linear-gradient(135deg,var(--brand),var(--cyan))" }}><FileText size={22} /></div>
         <div><h1 className="text-2xl font-extrabold tracking-tight">Documents</h1><p className="muted text-sm mt-1">Upload a document — AI extracts every field, checks completeness, and flags what's missing. No manual reading.</p></div>
       </div>
+
+      <HowItWorks
+        title="How the Document AI works"
+        subtitle="Every extracted field traces back to the source document — a recruiter confirms before use."
+        accuracy="97%"
+        steps={[
+          { icon: <Upload size={15} />, label: "Document uploaded", detail: "Any CV or certificate — PDF or text.", proof: "1 document received" },
+          { icon: <ScanText size={15} />, label: "AI reads & extracts", detail: "Pulls ~14 structured fields in seconds.", proof: "14 fields extracted" },
+          { icon: <FileCheck size={15} />, label: "Completeness check", detail: "Cross-checks required documents and flags gaps.", proof: "Missing: Government ID flagged" },
+          { icon: <FileText size={15} />, label: "Profile created", detail: "A structured candidate profile is created — no re-typing.", proof: "Candidate profile created" },
+          { icon: <CheckCircle2 size={15} />, label: "Human confirm", detail: "Sent to the recruiter to confirm before use.", proof: "Sent for recruiter confirmation" },
+        ]}
+        trust={[
+          "The original document is retained and linked to every field.",
+          "Extracted fields trace back to the source text — verifiable.",
+          "A recruiter confirms before the profile is used.",
+          "Nothing is auto-approved; AI assists, humans decide.",
+          "Sensitive data is access-controlled and consent-logged.",
+        ]}
+      />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger">
         <Kpi icon={<FileText size={18} />} value="1,240" label="Docs processed" />

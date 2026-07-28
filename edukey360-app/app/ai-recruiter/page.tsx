@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Card, AiBadge } from "@/components/ui";
-import { Bot, FileSearch, Users, CalendarCheck, MessageCircle, Mail, ShieldCheck, LineChart, School, Trophy, ArrowUpRight } from "lucide-react";
+import { HowItWorks } from "@/components/how-it-works";
+import { Bot, FileSearch, Users, CalendarCheck, MessageCircle, Mail, ShieldCheck, LineChart, School, Trophy, ArrowUpRight, ClipboardList, PhoneCall, UserCheck, Receipt } from "lucide-react";
 
 const AGENTS = [
   { name: "Recruitment Agent", icon: Bot, desc: "Orchestrates the full requirement → joining flow.", href: "/automation" },
@@ -22,6 +23,28 @@ export default function Page() {
         <div className="w-12 h-12 rounded-2xl grid place-items-center text-white shrink-0" style={{ background: "linear-gradient(135deg,var(--brand),var(--cyan))" }}><Bot size={22} /></div>
         <div><h1 className="text-2xl font-extrabold tracking-tight">AI Recruiter</h1><p className="muted text-sm mt-1">Ten specialised agents that execute your SOPs automatically. Open any agent's workspace.</p></div>
       </div>
+
+      <HowItWorks
+        title="How the AI Recruitment engine works — start to finish"
+        subtitle="From a new requirement to joining & invoice. Watch each step run, with its proof logged."
+        accuracy="94%"
+        steps={[
+          { icon: <ClipboardList size={15} />, label: "Requirement understood", detail: "AI reads the JD and builds a hiring plan, timeline & fill probability.", proof: "Requirement parsed · 14-day hiring plan generated" },
+          { icon: <Users size={15} />, label: "Candidates sourced & ranked", detail: "Ranks the verified pool by fit + predicted retention — each with a reason.", proof: "9 candidates ranked · top 3 above 90% match" },
+          { icon: <PhoneCall size={15} />, label: "AI screens & calls", detail: "Voice/WhatsApp screen collects the 7 data points and auto-tags.", proof: "8 screening calls completed · records updated" },
+          { icon: <UserCheck size={15} />, label: "Recruiter reviews", detail: "A human approves the shortlist — AI recommends, people decide.", proof: "Shortlist approved by Aarti Mehta" },
+          { icon: <ShieldCheck size={15} />, label: "Verified & interviewed", detail: "Identity & credentials verified; interview auto-scheduled.", proof: "Identity + degree verified · interview booked Fri 11:30" },
+          { icon: <Receipt size={15} />, label: "Joined & invoiced", detail: "Joining tracked; invoice auto-raised on deployment.", proof: "Invoice ₹47,200 auto-raised on joining" },
+        ]}
+        trust={[
+          "Every AI decision is a recommendation with a visible reason — never a black box.",
+          "Humans approve the key steps (shortlist, offer) — full human-in-the-loop.",
+          "Every action is logged with a timestamp and is fully reversible.",
+          "Candidate data is consent-first and DPDP-aligned.",
+          "You can override or edit anything the AI does, anytime.",
+          "Verification is tamper-proof and reusable across the system.",
+        ]}
+      />
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 stagger">
         {AGENTS.map((a) => {
           const Icon = a.icon;
