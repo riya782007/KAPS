@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, CSSProperties } from "react";
 import { Sparkles } from "lucide-react";
 
 export function Kpi({ icon, value, label, delta, hint }: { icon: ReactNode; value: ReactNode; label: string; delta?: string; hint?: string; }) {
@@ -15,8 +15,8 @@ export function Kpi({ icon, value, label, delta, hint }: { icon: ReactNode; valu
   );
 }
 
-export function Card({ children, className = "", pad = true }: { children: ReactNode; className?: string; pad?: boolean; }) {
-  return <div className={`card ${pad ? "p-4 sm:p-5" : ""} ${className}`}>{children}</div>;
+export function Card({ children, className = "", pad = true, style }: { children: ReactNode; className?: string; pad?: boolean; style?: CSSProperties; }) {
+  return <div className={`card ${pad ? "p-4 sm:p-5" : ""} ${className}`} style={style}>{children}</div>;
 }
 
 export function SectionTitle({ children, right }: { children: ReactNode; right?: ReactNode }) {
