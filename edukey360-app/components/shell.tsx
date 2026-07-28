@@ -1,6 +1,6 @@
 "use client";
 import { ReactNode, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   LayoutDashboard, ClipboardList, Users, School, UserCog, KanbanSquare,
@@ -80,12 +80,15 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 function Topbar({ onMenu }: { onMenu: () => void }) {
   const { theme, toggle } = useTheme();
+  const router = useRouter();
+  const go = (v: string) => router.push("/candidates" + (v.trim() ? `?q=${encodeURIComponent(v.trim())}` : ""));
   return (
     <header className="sticky top-0 z-30 glass flex items-center gap-3 px-4 sm:px-6 py-3" style={{ borderBottom: "1px solid var(--line)" }}>
       <button className="lg:hidden btn btn-line !p-2" onClick={onMenu}><Menu size={18} /></button>
       <div className="relative hidden sm:block">
         <Search size={15} className="absolute left-3 top-2.5 opacity-50" />
-        <input className="input !pl-9 !w-[260px]" placeholder="Search candidates, schools, requirements…" />
+        <input className="input !pl-9 !w-[260px]" placeholder="Search candidates…  (press Enter)"
+          onKeyDown={(e) => { if (e.key === "Enter") go((e.target as HTMLInputElement).value); }} />
       </div>
       <div className="ml-auto flex items-center gap-2">
         <span className="chip hidden sm:inline-flex"><span className="dot-live" /> 3 recruiters online</span>
