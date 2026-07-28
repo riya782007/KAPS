@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Sparkles } from "lucide-react";
 
 export function Kpi({ icon, value, label, delta, hint }: { icon: ReactNode; value: ReactNode; label: string; delta?: string; hint?: string; }) {
   return (
@@ -60,5 +61,16 @@ export function Ring({ pct, size = 52, color = "var(--brand)" }: { pct: number; 
 }
 
 export function AiBadge({ children = "AI" }: { children?: ReactNode }) {
-  return <span className="chip" style={{ background: "linear-gradient(120deg, rgba(18,165,140,.14), rgba(61,123,214,.12))" }}>✨ {children}</span>;
+  return <span className="chip" style={{ background: "linear-gradient(120deg, rgba(59,78,255,.14), rgba(24,200,255,.12))" }}><Sparkles size={11} /> {children}</span>;
+}
+
+export function Chip({ icon, children, tone }: { icon?: ReactNode; children: ReactNode; tone?: "brand" | "amber" | "blue" | "green" }) {
+  const tones: Record<string, string> = {
+    brand: "var(--brand-l);color:var(--brand-d)",
+    amber: "rgba(232,161,58,.16);color:#a4701c",
+    blue: "rgba(61,123,214,.14);color:#3560a8",
+    green: "rgba(63,157,91,.16);color:#2f8a4f",
+  };
+  const t = tones[tone || "brand"];
+  return <span className="chip" style={{ background: t.split(";")[0], color: t.split("color:")[1] }}>{icon}{children}</span>;
 }

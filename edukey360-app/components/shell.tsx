@@ -5,7 +5,7 @@ import Link from "next/link";
 import {
   LayoutDashboard, ClipboardList, Users, School, UserCog, KanbanSquare,
   Bot, PhoneCall, ShieldCheck, FileText, BarChart3, Workflow, Settings,
-  Search, Moon, Sun, Sparkles, Menu, X, Send
+  Search, Moon, Sun, Sparkles, Menu, X, Send, GraduationCap, FileSpreadsheet, KeyRound
 } from "lucide-react";
 import { useTheme } from "./theme";
 
@@ -17,6 +17,7 @@ const NAV = [
     { href: "/schools", label: "Schools", icon: School },
     { href: "/recruiters", label: "Recruiters", icon: UserCog },
     { href: "/pipeline", label: "Interview Pipeline", icon: KanbanSquare },
+    { href: "/import", label: "Import Data", icon: FileSpreadsheet },
   ]},
   { group: "AI Engine", items: [
     { href: "/ai-recruiter", label: "AI Recruiter", icon: Bot },
@@ -27,6 +28,9 @@ const NAV = [
   { group: "Grow", items: [
     { href: "/reports", label: "Reports", icon: BarChart3 },
     { href: "/automation", label: "Automation", icon: Workflow },
+  ]},
+  { group: "Admin", items: [
+    { href: "/team", label: "Team & Roles", icon: KeyRound },
     { href: "/settings", label: "Settings", icon: Settings },
   ]},
 ];
@@ -40,10 +44,10 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
       data-open={open}
     >
       <div className="flex items-center gap-3 px-4 pt-4 pb-3">
-        <div className="w-9 h-9 rounded-xl grid place-items-center text-lg" style={{ background: "rgba(255,255,255,.13)" }}>🎓</div>
+        <div className="w-9 h-9 rounded-xl grid place-items-center text-white" style={{ background: "linear-gradient(135deg,var(--brand),var(--brand-d))" }}><GraduationCap size={19} /></div>
         <div>
           <div className="text-white font-extrabold text-[15px] leading-tight">Edukey360 OS</div>
-          <div className="text-[10px] tracking-wide" style={{ color: "#8fd8c9" }}>AI Recruitment OS</div>
+          <div className="text-[10px] tracking-wide" style={{ color: "#8fa2ff" }}>AI Recruitment OS</div>
         </div>
         <button className="ml-auto lg:hidden text-white/70" onClick={onClose}><X size={18} /></button>
       </div>
@@ -68,7 +72,7 @@ function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
         ))}
       </nav>
       <div className="px-4 py-3 text-[10.5px]" style={{ color: "rgba(255,255,255,.55)", borderTop: "1px solid rgba(255,255,255,.08)" }}>
-        One operating system.<br />Built by <b style={{ color: "#7fe9d3" }}>NEWVORA</b>.
+        One operating system.<br />Built by <b style={{ color: "#8fa2ff" }}>NEWVORA</b>.
       </div>
     </aside>
   );
@@ -84,7 +88,7 @@ function Topbar({ onMenu }: { onMenu: () => void }) {
         <input className="input !pl-9 !w-[260px]" placeholder="Search candidates, schools, requirements…" />
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <span className="chip"><span className="dot-live" /> {typeof window !== "undefined" ? "" : ""}3 recruiters online</span>
+        <span className="chip hidden sm:inline-flex"><span className="dot-live" /> 3 recruiters online</span>
         <button className="btn btn-line !p-2" onClick={toggle} aria-label="Toggle theme">
           {theme === "light" ? <Moon size={17} /> : <Sun size={17} />}
         </button>
@@ -110,7 +114,7 @@ function AiAssistant() {
     "Summarize Ananya Sharma",
   ];
   const [msgs, setMsgs] = useState<{ role: "ai" | "me"; text: string }[]>([
-    { role: "ai", text: "Hi Aarti 👋 I'm your Recruitment Copilot. Ask me anything, or tap a suggestion below." },
+    { role: "ai", text: "Hi Aarti — I'm your Recruitment Copilot. Ask me anything, or tap a suggestion below." },
   ]);
   const answer = (q: string): string => {
     const s = q.toLowerCase();
@@ -132,7 +136,7 @@ function AiAssistant() {
       </button>
       {open && (
         <div className="fixed bottom-24 right-6 z-50 w-[360px] max-w-[92vw] card enter overflow-hidden" style={{ boxShadow: "var(--shadow-lg)" }}>
-          <div className="px-4 py-3 text-white flex items-center gap-2" style={{ background: "linear-gradient(120deg,#0f2620,#12a58c)" }}>
+          <div className="px-4 py-3 text-white flex items-center gap-2" style={{ background: "linear-gradient(120deg,#3B4EFF,#18C8FF)" }}>
             <Sparkles size={16} /><b className="text-sm">Recruitment Copilot</b>
             <button className="ml-auto opacity-80" onClick={() => setOpen(false)}><X size={16} /></button>
           </div>

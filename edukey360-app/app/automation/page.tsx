@@ -1,5 +1,5 @@
 import { Card, AiBadge } from "@/components/ui";
-import { Workflow, ArrowDown } from "lucide-react";
+import { Workflow, ArrowDown, Sparkles, User } from "lucide-react";
 
 const FLOW = [
   "New Requirement", "AI finds candidates", "AI screens & calls", "Recruiter reviews",
@@ -21,8 +21,8 @@ export default function Page() {
               <div className="card !rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: i % 2 ? "var(--panel)" : "var(--panel-2)" }}>
                 <span className="w-6 h-6 rounded-full grid place-items-center text-[11px] font-bold text-white shrink-0" style={{ background: "var(--brand)" }}>{i + 1}</span>
                 <span className="text-[13px] font-semibold">{step}</span>
-                {(i === 1 || i === 2 || i === 5 || i === 8) && <span className="chip ml-auto">✨ AI</span>}
-                {(i === 3 || i === 4) && <span className="chip ml-auto" style={{ background: "rgba(61,123,214,.14)", color: "#3560a8" }}>👤 Human</span>}
+                {(i === 1 || i === 2 || i === 5 || i === 8) && <span className="chip ml-auto"><Sparkles size={11} /> AI</span>}
+                {(i === 3 || i === 4) && <span className="chip ml-auto" style={{ background: "rgba(61,123,214,.14)", color: "#3560a8" }}><User size={11} /> Human</span>}
               </div>
               {i < FLOW.length - 1 && <div className="flex justify-center py-1"><ArrowDown size={16} className="muted" /></div>}
             </div>

@@ -7,7 +7,10 @@ export default function PipelinePage() {
   const [cands, setCands] = useState<Candidate[]>(CANDIDATES);
   const [drag, setDrag] = useState<string | null>(null);
 
-  const move = (id: string, stage: Stage) => setCands((cs) => cs.map((c) => (c.id === id ? { ...c, stage } : c)));
+  const move = (id: string, stage: Stage) => {
+    setCands((cs) => cs.map((c) => (c.id === id ? { ...c, stage } : c)));
+    fetch("/api/pipeline", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, stage }) }).catch(() => {});
+  };
 
   return (
     <div className="space-y-5">

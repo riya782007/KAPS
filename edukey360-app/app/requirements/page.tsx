@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import { Card, SectionTitle, AiBadge, PriorityTag, Ring, Avatar } from "@/components/ui";
+import { Card, SectionTitle, AiBadge, PriorityTag, Ring, Avatar, Chip } from "@/components/ui";
 import { REQUIREMENTS, SCHOOLS, RECRUITERS, schoolName, type Priority } from "@/lib/mock";
-import { Plus, Sparkles, Target, CalendarClock, Users, Radar, CheckCircle2, Wand2 } from "lucide-react";
+import { Plus, CalendarClock, Users, Radar, CheckCircle2, Wand2, Clock, Sparkles } from "lucide-react";
 
 const inr = (n: number) => "₹" + n.toLocaleString("en-IN");
 
@@ -54,6 +54,7 @@ export default function RequirementsPage() {
     setThinking(true); setPlan(null);
     const id = "req" + (reqs.length + 1);
     setReqs((r) => [{ id, role: f.role, schoolId: f.schoolId, board: f.board, subject: f.subject, minExp: f.exp, salaryMin: f.sMin, salaryMax: f.sMax, vacancies: f.vacancies, joining: f.joining, priority: f.priority, status: "Open", createdBy: "Aarti Mehta" }, ...r]);
+    fetch("/api/requirements", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, role: f.role, schoolId: f.schoolId, board: f.board, subject: f.subject, minExp: f.exp, salaryMin: f.sMin, salaryMax: f.sMax, vacancies: f.vacancies, joining: f.joining, priority: f.priority }) }).catch(() => {});
     setTimeout(() => { setThinking(false); setPlan(buildPlan({ role: f.role, subject: f.subject, board: f.board, exp: f.exp, sMax: f.sMax, priority: f.priority, vacancies: f.vacancies })); setShowForm(false); }, 1100);
   };
 
@@ -151,7 +152,7 @@ export default function RequirementsPage() {
                 <span className="chip">{r.minExp}+ yrs</span>
                 <span className="chip">{inr(r.salaryMin * 1000)}–{inr(r.salaryMax * 1000)}</span>
                 <span className="chip">{r.vacancies} vacancy{r.vacancies > 1 ? "s" : ""}</span>
-                <span className="chip">⏱ SLA {sla}d</span>
+                <Chip icon={<Clock size={11} />}>SLA {sla}d</Chip>
               </div>
               <div className="flex items-center justify-between mt-3 text-[12px]">
                 <span className="chip" style={{ background: r.status === "Filled" ? "rgba(63,157,91,.16)" : "var(--brand-l)", color: r.status === "Filled" ? "#2f8a4f" : "var(--brand-d)" }}>{r.status}</span>

@@ -10,14 +10,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          DEFAULT: "#12a58c",
-          dark: "#0e8574",
-          light: "#e6f5f1",
-        },
+        brand: { DEFAULT: "#3B4EFF", dark: "#3042F2", light: "#EEF1FF" },
+        cyan: "#18C8FF",
+        teal: "#18D8A5",
+        success: "#16C47F",
+        warning: "#F7B731",
+        error: "#F04438",
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["General Sans", "Inter", "sans-serif"],
+        mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
       },
       boxShadow: {
         soft: "0 4px 22px rgba(15,38,32,.08)",

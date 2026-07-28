@@ -15,6 +15,10 @@ export interface Recruiter {
   id: string; name: string; role: string; online: boolean;
   target: number; placed: number; calls: number; avatarHue: number;
 }
+export interface Employee {
+  id: string; name: string; role: string; passcode: string; email?: string;
+  responsibilities: string[]; target: number; active: boolean;
+}
 export interface Requirement {
   id: string; role: string; schoolId: string; board: string; subject: string;
   minExp: number; salaryMin: number; salaryMax: number; vacancies: number;
@@ -41,6 +45,17 @@ export const RECRUITERS: Recruiter[] = [
   { id: "r3", name: "Sana Kapoor", role: "Recruiter", online: false, target: 10, placed: 9, calls: 52, avatarHue: 30 },
   { id: "r4", name: "Rohan Das", role: "Telerecruiter", online: true, target: 8, placed: 4, calls: 74, avatarHue: 280 },
 ];
+
+export const EMPLOYEES: Employee[] = [
+  { id: "e1", name: "Varun Bahl", role: "Business Head", passcode: "VB-4821", email: "varun@edukey360.com", responsibilities: ["Strategy", "Client escalations", "Revenue"], target: 0, active: true },
+  { id: "e2", name: "Aarti Mehta", role: "Senior Recruiter", passcode: "AM-7310", email: "aarti@edukey360.com", responsibilities: ["Requirement planning", "Screening quality", "Team guidance"], target: 12, active: true },
+  { id: "e3", name: "Vikas Nair", role: "Recruiter", passcode: "VN-2288", responsibilities: ["Sourcing", "Interview coordination"], target: 10, active: true },
+  { id: "e4", name: "Sana Kapoor", role: "Recruiter", passcode: "SK-9074", responsibilities: ["Sourcing", "Candidate engagement"], target: 10, active: false },
+  { id: "e5", name: "Rohan Das", role: "Telerecruiter", passcode: "RD-5567", responsibilities: ["Calling", "Verification", "Database updates"], target: 8, active: true },
+  { id: "e6", name: "Neha Sethi", role: "Business Developer", passcode: "NS-3390", responsibilities: ["Lead generation", "School onboarding", "Proposals"], target: 6, active: true },
+];
+
+export const ROLES = ["Admin", "Business Head", "Business Developer", "Senior Recruiter", "Recruiter", "Junior Recruiter", "Telerecruiter"];
 
 export const REQUIREMENTS: Requirement[] = [
   { id: "req1", role: "PGT Physics", schoolId: "sch1", board: "CBSE", subject: "Physics", minExp: 3, salaryMin: 45, salaryMax: 60, vacancies: 2, joining: "2026-08-15", priority: "High", status: "Open", createdBy: "Aarti Mehta" },
