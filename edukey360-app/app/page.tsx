@@ -1,11 +1,13 @@
+import { ReactNode } from "react";
 import { Kpi, Card, SectionTitle, Avatar, AiBadge, Bar, Chip } from "@/components/ui";
+import { Tilt } from "@/components/tilt";
 import { CountUp } from "@/components/count";
 import { AreaChart, Donut } from "@/components/charts";
 import { getCandidates, getRequirements, getRecruiters, getSchools, dataSource } from "@/lib/db";
 import { STAGES } from "@/lib/mock";
 import {
   CalendarClock, ClipboardList, UserCog, Users, GraduationCap, BellRing,
-  FileSignature, PlaneTakeoff, Bot, TrendingUp, Database, CheckCircle2, Table2, Clock
+  FileSignature, PlaneTakeoff, Bot, TrendingUp, CheckCircle2, Table2, Clock
 } from "lucide-react";
 
 const ACTIVITY = [
@@ -48,46 +50,70 @@ export default async function Dashboard() {
     { label: "Closing", value: sc("Interview") + sc("Offer"), color: "#F7B731" },
     { label: "Won", value: sc("Joining") + sc("Placed"), color: "#16C47F" },
   ];
+  const kpis: { icon: ReactNode; to: number; label: string; delta?: string; hint?: string }[] = [
+    { icon: <CalendarClock size={18} />, to: k.interviews, label: "Today's Interviews", delta: "2 in next 3 hrs" },
+    { icon: <ClipboardList size={18} />, to: k.activeReqs, label: "Active Requirements", delta: "+1 today" },
+    { icon: <UserCog size={18} />, to: k.online, label: "Recruiters Online", hint: "of 4 total" },
+    { icon: <Users size={18} />, to: k.pipeline, label: "Candidates in Pipeline", delta: "9 added by AI" },
+    { icon: <GraduationCap size={18} />, to: k.placements, label: "Placements (MTD)", delta: "+3 vs last week" },
+    { icon: <BellRing size={18} />, to: 7, label: "Pending Follow-ups", hint: "all auto-scheduled" },
+    { icon: <FileSignature size={18} />, to: k.offers, label: "Offers Sent" },
+    { icon: <PlaneTakeoff size={18} />, to: k.joining, label: "Joining This Week" },
+  ];
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Good morning, Aarti</h1>
-          <p className="muted text-sm mt-1">Your recruitment OS ran <b style={{ color: "var(--brand-d)" }}>38 automations</b> overnight — no manual entry.</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Chip icon={<Database size={12} />} tone={dataSource === "Supabase" ? "green" : "blue"}>{dataSource}</Chip>
-          <Chip icon={<Table2 size={12} />}>Replaces Excel trackers</Chip>
-          <Chip icon={<BellRing size={12} />}>Auto follow-ups</Chip>
-          <Chip icon={<CheckCircle2 size={12} />}>EOD reports auto-built</Chip>
+      <div className="hero-3d enter">
+        <span className="hero-grid" />
+        <span className="hero-orb" />
+        <div className="flex flex-wrap items-end justify-between gap-4 relative">
+          <div>
+            <span className="hero-pill"><span className="dot-live" /> Live · {dataSource} connected</span>
+            <h1 className="text-[26px] sm:text-[30px] font-extrabold tracking-tight mt-3" style={{ fontFamily: '"General Sans", Inter, sans-serif' }}>Good morning, Aarti</h1>
+            <p className="text-[13.5px] mt-1.5" style={{ color: "rgba(255,255,255,.85)" }}>Your recruitment OS ran <b>38 automations</b> overnight — zero manual entry.</p>
+            <div className="flex gap-2 flex-wrap mt-4">
+              <span className="hero-pill"><Table2 size={12} /> Replaces Excel trackers</span>
+              <span className="hero-pill"><BellRing size={12} /> Auto follow-ups</span>
+              <span className="hero-pill"><CheckCircle2 size={12} /> EOD reports auto-built</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-[11px] font-bold uppercase tracking-wider" style={{ color: "rgba(255,255,255,.7)" }}>Revenue (MTD)</div>
+            <div className="text-4xl font-extrabold num mt-1">{inr(k.revenue)}</div>
+            <div className="text-[13px] font-semibold flex items-center justify-end gap-1 mt-1" style={{ color: "#c8ffe9" }}><TrendingUp size={15} /> +18% QoQ</div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 stagger">
-        <Kpi icon={<CalendarClock size={18} />} value={<CountUp to={k.interviews} />} label="Today's Interviews" delta="2 in next 3 hrs" />
-        <Kpi icon={<ClipboardList size={18} />} value={<CountUp to={k.activeReqs} />} label="Active Requirements" delta="+1 today" />
-        <Kpi icon={<UserCog size={18} />} value={<CountUp to={k.online} />} label="Recruiters Online" hint="of 4 total" />
-        <Kpi icon={<Users size={18} />} value={<CountUp to={k.pipeline} />} label="Candidates in Pipeline" delta="9 added by AI" />
-        <Kpi icon={<GraduationCap size={18} />} value={<CountUp to={k.placements} />} label="Placements (MTD)" delta="+3 vs last week" />
-        <Kpi icon={<BellRing size={18} />} value={<CountUp to={7} />} label="Pending Follow-ups" hint="all auto-scheduled" />
-        <Kpi icon={<FileSignature size={18} />} value={<CountUp to={k.offers} />} label="Offers Sent" />
-        <Kpi icon={<PlaneTakeoff size={18} />} value={<CountUp to={k.joining} />} label="Joining This Week" />
+      <div className="rail flex md:grid md:grid-cols-4 gap-3 sm:gap-4 overflow-x-auto md:overflow-visible snap-x snap-mandatory pb-1 -mx-1 px-1 stagger">
+        {kpis.map((m, i) => (
+          <div key={i} className="snap-start shrink-0 basis-[62%] sm:basis-[240px] md:basis-auto min-w-0">
+            <Tilt>
+              <Kpi icon={m.icon} value={<CountUp to={m.to} />} label={m.label} delta={m.delta} hint={m.hint} />
+            </Tilt>
+          </div>
+        ))}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2">
-          <SectionTitle right={<AiBadge>forecast</AiBadge>}>Placements &amp; Revenue Trend</SectionTitle>
-          <div className="flex items-baseline gap-3 mb-1">
-            <div className="text-3xl font-extrabold" style={{ color: "var(--brand-d)" }}>{inr(k.revenue)}</div>
-            <span className="text-[13px] font-semibold flex items-center gap-1" style={{ color: "var(--brand)" }}><TrendingUp size={15} /> +18% QoQ</span>
-          </div>
-          <AreaChart data={trend} labels={["Feb", "Mar", "Apr", "May", "Jun", "Jul"]} />
-        </Card>
-        <Card>
-          <SectionTitle>Pipeline Distribution</SectionTitle>
-          <Donut segments={donut} />
-        </Card>
+        <div className="lg:col-span-2">
+          <Tilt max={4}>
+            <Card>
+              <SectionTitle right={<AiBadge>forecast</AiBadge>}>Placements &amp; Revenue Trend</SectionTitle>
+              <div className="flex items-baseline gap-3 mb-1">
+                <div className="text-3xl font-extrabold" style={{ color: "var(--brand-d)" }}>{inr(k.revenue)}</div>
+                <span className="text-[13px] font-semibold flex items-center gap-1" style={{ color: "var(--brand)" }}><TrendingUp size={15} /> +18% QoQ</span>
+              </div>
+              <AreaChart data={trend} labels={["Feb", "Mar", "Apr", "May", "Jun", "Jul"]} />
+            </Card>
+          </Tilt>
+        </div>
+        <Tilt max={4}>
+          <Card>
+            <SectionTitle>Pipeline Distribution</SectionTitle>
+            <Donut segments={donut} />
+          </Card>
+        </Tilt>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">

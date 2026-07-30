@@ -146,6 +146,65 @@ h1, h2, h3, h4, h5 { font-family: "General Sans", Inter, sans-serif; letter-spac
   }
 }
 
+/* ============================================================
+   3D scene · tilt cards · swipe rail · animated hero
+   ============================================================ */
+.scene { perspective: 1100px; }
+.tilt {
+  transform-style: preserve-3d;
+  transition: transform .22s cubic-bezier(.22,.9,.3,1), box-shadow .22s ease;
+  will-change: transform;
+}
+.tilt-shine {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity .25s ease;
+  background: radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.35), transparent 42%);
+  mix-blend-mode: overlay;
+}
+.tilt:hover .tilt-shine { opacity: 1; }
+
+/* swipe rail — horizontal snap on touch/mobile, hidden scrollbar */
+.rail { scrollbar-width: none; -ms-overflow-style: none; }
+.rail::-webkit-scrollbar { display: none; }
+
+/* animated 3D hero banner */
+.hero-3d {
+  position: relative; overflow: hidden; border-radius: 24px; padding: 26px 28px; color: #fff;
+  background: linear-gradient(120deg, #2A38D8 0%, #3B4EFF 42%, #18C8FF 100%);
+  box-shadow: var(--shadow-lg);
+  isolation: isolate;
+}
+.hero-3d::before, .hero-3d::after {
+  content: ""; position: absolute; border-radius: 50%; filter: blur(34px); z-index: -1;
+  animation: floatb 9s ease-in-out infinite;
+}
+.hero-3d::before { width: 240px; height: 240px; background: rgba(24,216,165,.55); top: -70px; right: 6%; }
+.hero-3d::after { width: 200px; height: 200px; background: rgba(24,200,255,.5); bottom: -80px; right: 24%; animation-delay: -3.5s; }
+@keyframes floatb { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-20px) } }
+.hero-grid {
+  position: absolute; inset: 0; z-index: -1; opacity: .6;
+  background-image:
+    linear-gradient(rgba(255,255,255,.10) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.10) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(680px 240px at 18% -10%, #000, transparent 75%);
+  mask-image: radial-gradient(680px 240px at 18% -10%, #000, transparent 75%);
+}
+.hero-orb {
+  position: absolute; top: -40px; left: -30px; width: 180px; height: 180px; z-index: -1;
+  border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.28), rgba(255,255,255,0) 60%);
+  animation: floatb 11s ease-in-out infinite;
+}
+.hero-pill {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700;
+  padding: 5px 12px; border-radius: 999px; color: #fff;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.24); backdrop-filter: blur(6px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d::before, .hero-3d::after, .hero-orb { animation: none; }
+  .tilt { transition: none; }
+}
+
 .muted { color: var(--muted); }
 .enter { animation: pop .4s cubic-bezier(.22,.9,.3,1) both; }
 @keyframes pop { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
@@ -160,6 +219,14 @@ h1, h2, h3, h4, h5 { font-family: "General Sans", Inter, sans-serif; letter-spac
 
 /* subtle hover glow for interactive cards */
 .hover-glow:hover { box-shadow: 0 0 40px rgba(59,78,255,.15), var(--shadow-md); }
+
+/* floating AI assistant button */
+.shadow-lg2 { box-shadow: 0 12px 32px rgba(59,78,255,.42); }
+.animate-pulse2 { animation: pulse2 2.8s ease-in-out infinite; }
+@keyframes pulse2 {
+  0%, 100% { box-shadow: 0 12px 30px rgba(59,78,255,.40); }
+  50% { box-shadow: 0 14px 46px rgba(59,78,255,.62); }
+}
 
 /* loading skeleton (shimmer) */
 .skel { position: relative; overflow: hidden; background: var(--panel-2); border: 1px solid var(--line); border-radius: 16px; }
