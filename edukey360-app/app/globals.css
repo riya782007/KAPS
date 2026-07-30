@@ -233,3 +233,11 @@ h1, h2, h3, h4, h5 { font-family: "General Sans", Inter, sans-serif; letter-spac
 .skel::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%);
   background: linear-gradient(90deg, transparent, rgba(59,78,255,.10), transparent); animation: shimmer 1.35s infinite; }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* print — clean report export (hide chrome, show only content) */
+@media print {
+  aside, header, .no-print { display: none !important; }
+  main { padding: 0 !important; max-width: 100% !important; }
+  .card { box-shadow: none !important; border-color: #d8dee9 !important; break-inside: avoid; }
+  body { background: #fff !important; }
+}

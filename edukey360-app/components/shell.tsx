@@ -142,7 +142,7 @@ function AiAssistant() {
   return (
     <>
       <button onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-50 btn btn-primary !rounded-full !px-4 !py-3 shadow-lg2 animate-pulse2">
+        className="fixed bottom-6 right-6 z-50 btn btn-primary !rounded-full !px-4 !py-3 shadow-lg2 animate-pulse2 no-print">
         <Sparkles size={18} /> AI Assistant
       </button>
       {open && (
